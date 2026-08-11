@@ -66,8 +66,8 @@ infrastructure/   IaC / environment notes (mostly Vercel + Marketplace config as
 
 ## 5. Roadmap (phases, per master spec §55)
 
-1. **Foundation** (this pass): architecture, design system, auth, foundation DB schema, navigation shell, onboarding UI.
-2. **Fitness core**: assessment, exercise library, deterministic workout engine, the 15 agents wired for real, workout mode.
+1. **Foundation** ✅: architecture, design system, auth, foundation DB schema, navigation shell, onboarding UI.
+2. **Fitness core** ✅ (code complete; live end-to-end test pending a credit card on the Vercel account for the AI Gateway — see §6): assessment, exercise library, deterministic workout engine, the 7 generation-pipeline agents wired for real, workout mode. The remaining 8 agents (recovery, social, gamification, motivation, moderation, QA, code-review) stay as design contracts until their phases.
 3. **Evolution**: history, progression tracking, check-ins, metrics dashboard, FIT Score.
 4. **Gamification**: XP, levels, streaks, achievements, challenges.
 5. **Social**: profiles, feed, posts, friends, followers, comments.
@@ -90,7 +90,8 @@ infrastructure/   IaC / environment notes (mostly Vercel + Marketplace config as
 - No agent may diagnose, guarantee outcomes, or override the Safety Agent. This is enforced structurally: the Safety Agent's `blocked` verdict is a hard gate in the rules engine, not a suggestion an LLM can talk itself out of.
 
 **Dependencies**
-- Clerk, Neon, Upstash, Vercel Blob, AI Gateway are all Marketplace/Vercel-managed — provisioning requires the account owner's Vercel login (done: `petrucelli718-9487`) and, for App Store/Play Store distribution later, Apple Developer + Google Play Console accounts (not yet provisioned — needed before Phase 8 store submission).
+- Clerk, Neon, Upstash, Vercel Blob, AI Gateway are all Marketplace/Vercel-managed — provisioning requires the account owner's Vercel login (done: `petrucelli718-9487`). Neon and Clerk are provisioned and live. Upstash is still pending browser terms acceptance (same one-time step Neon/Clerk needed). The AI Gateway itself needs no separate provisioning but currently rejects requests with `customer_verification_required` — **a credit card needs to be added to the Vercel account** (Vercel dashboard → AI Gateway → add card) before any agent call will succeed; the code path is otherwise complete and unit-tested independent of this.
+- For App Store/Play Store distribution later, Apple Developer + Google Play Console accounts are not yet provisioned — needed before Phase 8 store submission.
 
 ## 7. Decisions deferred (documented, not blocking)
 
