@@ -18,7 +18,7 @@ Conventions:
 | `user_goals` | Selected objective(s) from onboarding (emagrecer, hipertrofia, força, condicionamento, saúde, outro). |
 | `user_health_profiles` | Self-reported health flags/limitations from onboarding (never a diagnosis). High-sensitivity — see `SECURITY.md`. |
 | `training_preferences` | Onboarding-collected training parameters (days/week, minutes/session, experience level, equipment preference) — raw inputs the Fitness Assessor agent consumes in Phase 2. |
-| `body_metrics` | Weight/height/measurements time series, used to derive BMI trend (never shown as a diagnosis). |
+| `body_metrics` | Weight/height/age/measurements time series (age is self-reported per entry, not derived from a birth date), used to derive BMI trend (never shown as a diagnosis). |
 | `audit_logs` | Append-only log of security-relevant events (login, data export, data deletion, permission changes). |
 
 ## Phase 2 — Fitness core

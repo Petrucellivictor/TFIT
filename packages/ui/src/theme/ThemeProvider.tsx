@@ -40,7 +40,7 @@ export interface ThemeProviderProps {
 
 export function ThemeProvider({ preference = "system", reducedMotion = false, children }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
-  const scheme = preference === "system" ? (systemScheme ?? "light") : preference;
+  const scheme = preference === "system" ? (systemScheme === "dark" ? "dark" : "light") : preference;
   const theme = useMemo(() => buildTheme(scheme, reducedMotion), [scheme, reducedMotion]);
 
   return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;

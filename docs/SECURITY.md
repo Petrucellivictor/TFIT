@@ -4,8 +4,8 @@
 
 Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/clerk-expo` on mobile) owns password hashing, session issuance, refresh-token rotation, and brute-force protection. The backend never sees or stores a password. `users.clerk_id` is the only identity linkage we store; a Clerk webhook (`/api/webhooks/clerk`) keeps our `users`/`profiles` rows in sync on create/update/delete.
 
-- Mobile stores the session token via `expo-secure-store` (Clerk Expo SDK default) — never `AsyncStorage`.
-- All backend routes under `/api/*` (except the Clerk webhook, which verifies via svix signature instead) require a valid Clerk session; enforced in `middleware.ts` via `clerkMiddleware` + `auth.protect()`, not per-route ad hoc checks.
+- Mobile stores the session token via the Clerk Expo SDK's built-in secure token cache (`@clerk/expo/token-cache`, backed by `expo-secure-store`) — never `AsyncStorage`.
+- `src/proxy.ts` runs `clerkMiddleware()` on every request only to establish the auth context (so `auth()` is available downstream) — it does **not** decide authorization. Path-matching authorization (`createRouteMatcher` + `auth.protect()` in middleware) is deprecated by Clerk in favor of resource-based checks: every route handler that needs a signed-in user calls `auth()` itself and returns 401 via `errors.unauthorized()` (see `src/lib/http.ts`). This avoids the exact failure mode path-matching has — a route whose matcher pattern silently stops covering it.
 - Rate limiting on auth-adjacent and AI endpoints via Upstash `Ratelimit` — sliding window, keyed by user ID (authenticated) or IP (pre-auth).
 
 ## Data classification

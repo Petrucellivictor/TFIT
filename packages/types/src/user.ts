@@ -50,6 +50,7 @@ export interface BodyMetric {
   weightKg: number | null;
   heightCm: number | null;
   bodyFatPercent: number | null;
+  age: number | null;
   recordedAt: ISODateTime;
 }
 

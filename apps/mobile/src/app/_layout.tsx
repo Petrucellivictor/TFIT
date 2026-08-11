@@ -1,18 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { ClerkProvider } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider as TfitThemeProvider } from "@tfit/ui";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Slot } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { queryClient } from "@/lib/queryClient";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-SplashScreen.preventAutoHideAsync();
+if (!publishableKey) {
+  throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY — see apps/mobile/.env.example");
+}
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <TfitThemeProvider preference="system">
+            <StatusBar style="auto" />
+            <Slot />
+          </TfitThemeProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 }
