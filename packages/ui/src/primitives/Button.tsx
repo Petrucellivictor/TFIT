@@ -22,19 +22,27 @@ export function Button({ label, variant = "primary", onPressIn, onPressOut, disa
 
   const isPrimary = variant === "primary";
 
+  // Reanimated shared values are mutated by design outside React's render
+  // cycle — the eslint-plugin-react-hooks immutability rule doesn't know
+  // that yet, so it's disabled for these two handlers.
+  /* eslint-disable react-hooks/immutability */
+  const handlePressIn: NonNullable<ButtonProps["onPressIn"]> = (e) => {
+    scale.value = withTiming(0.97, { duration });
+    onPressIn?.(e);
+  };
+  const handlePressOut: NonNullable<ButtonProps["onPressOut"]> = (e) => {
+    scale.value = withTiming(1, { duration });
+    onPressOut?.(e);
+  };
+  /* eslint-enable react-hooks/immutability */
+
   return (
     <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: Boolean(disabled) }}
       disabled={disabled}
-      onPressIn={(e) => {
-        scale.value = withTiming(0.97, { duration });
-        onPressIn?.(e);
-      }}
-      onPressOut={(e) => {
-        scale.value = withTiming(1, { duration });
-        onPressOut?.(e);
-      }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={[
         animatedStyle,
         styles.base,

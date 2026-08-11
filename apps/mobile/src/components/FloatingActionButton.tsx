@@ -12,13 +12,25 @@ export function FloatingActionButton({ onPress }: { onPress: () => void }) {
   const duration = theme.reducedMotion ? 0 : theme.motion.duration.fast;
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
+  // Reanimated shared values are mutated by design outside React's render
+  // cycle — the eslint-plugin-react-hooks immutability rule doesn't know
+  // that yet, so it's disabled for these two handlers.
+  /* eslint-disable react-hooks/immutability */
+  const onPressIn = () => {
+    scale.value = withTiming(0.92, { duration });
+  };
+  const onPressOut = () => {
+    scale.value = withTiming(1, { duration });
+  };
+  /* eslint-enable react-hooks/immutability */
+
   return (
     <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel="Ações rápidas"
       onPress={onPress}
-      onPressIn={() => (scale.value = withTiming(0.92, { duration }))}
-      onPressOut={() => (scale.value = withTiming(1, { duration }))}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       style={[
         animatedStyle,
         {
