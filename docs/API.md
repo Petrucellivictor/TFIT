@@ -47,3 +47,14 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 | `POST` | `/api/workouts/sessions` | Start a workout session (`{ workoutId }`) — verifies the workout belongs to the caller's own plan. |
 | `POST` | `/api/workouts/sessions/:id/sets` | Log a completed set (`{ workoutExerciseId, setNumber, repsCompleted, weightKg?, feedback? }`); flags `isNewPersonalRecord`. |
 | `POST` | `/api/workouts/sessions/:id/complete` | Mark a session completed. |
+
+## Phase 3 endpoints (implemented)
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET`/`POST` | `/api/checkins` | List last 30 days / submit today's check-in (upsert — one per day). |
+| `GET`/`POST` | `/api/measurements` | List / log a body-circumference entry. |
+| `GET`/`POST` | `/api/body-metrics` | List / log a weight (+ optional body fat %) entry — ongoing tracking beyond the onboarding snapshot. |
+| `GET`/`POST` | `/api/goals` | List / create a user-defined goal. |
+| `PATCH` | `/api/goals/:id` | Update a goal's status (`active`/`achieved`/`abandoned`). |
+| `GET` | `/api/progress` | Aggregate for the evolution dashboard: FIT Score, weight trend, recent PRs, active goals, check-in streak. |

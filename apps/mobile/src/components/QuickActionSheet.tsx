@@ -7,23 +7,23 @@ import { Stack, Surface, Text, useTheme } from "@tfit/ui";
 interface QuickAction {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
-  onPress: (navigateToTreinos: () => void) => void;
+  route?: string;
   availableFrom?: string;
 }
 
 const ACTIONS: QuickAction[] = [
-  { icon: "barbell-outline", label: "Iniciar treino", onPress: (navigateToTreinos) => navigateToTreinos() },
-  { icon: "camera-outline", label: "Postar", onPress: () => {}, availableFrom: "Fase 5" },
-  { icon: "checkmark-circle-outline", label: "Check-in do dia", onPress: () => {}, availableFrom: "Fase 3" },
+  { icon: "barbell-outline", label: "Iniciar treino", route: "/(app)/treinos" },
+  { icon: "checkmark-circle-outline", label: "Check-in do dia", route: "/checkin" },
+  { icon: "camera-outline", label: "Postar", availableFrom: "Fase 5" },
 ];
 
 export function QuickActionSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const theme = useTheme();
   const router = useRouter();
 
-  const navigateToTreinos = () => {
+  const onPressAction = (action: QuickAction) => {
     onClose();
-    router.push("/(app)/treinos");
+    if (action.route) router.push(action.route as never);
   };
 
   return (
@@ -46,7 +46,7 @@ export function QuickActionSheet({ visible, onClose }: { visible: boolean; onClo
             {ACTIONS.map((action) => (
               <Pressable
                 key={action.label}
-                onPress={() => (action.availableFrom ? onClose() : action.onPress(navigateToTreinos))}
+                onPress={() => onPressAction(action)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",

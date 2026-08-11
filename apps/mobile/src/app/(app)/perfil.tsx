@@ -1,11 +1,14 @@
-import { ActivityIndicator, Image } from "react-native";
+import { ActivityIndicator, Image, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 import { useClerk } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useMe } from "@/hooks/useMe";
 
 export default function PerfilScreen() {
   const theme = useTheme();
+  const router = useRouter();
   const { signOut } = useClerk();
   const me = useMe();
 
@@ -41,6 +44,18 @@ export default function PerfilScreen() {
             </Stack>
           </Stack>
         )}
+
+        <Pressable onPress={() => router.push("/evolution")}>
+          <Surface level="raised" style={{ padding: theme.space.md }}>
+            <Stack direction="row" justify="space-between" align="center">
+              <Stack direction="row" gap="sm" align="center">
+                <Ionicons name="trending-up-outline" size={20} color={theme.colors.accent.primary} />
+                <Text variant="bodyStrong">Ver evolução</Text>
+              </Stack>
+              <Ionicons name="chevron-forward" size={18} color={theme.colors.text.secondary} />
+            </Stack>
+          </Surface>
+        </Pressable>
 
         <Stack style={{ flex: 1 }} />
 

@@ -56,3 +56,12 @@ export const workoutSessionStatusEnum = pgEnum("workout_session_status", [
 ]);
 
 export const setFeedbackEnum = pgEnum("set_feedback", ["easy", "adequate", "hard", "very_hard"]);
+
+export const goalTypeEnum = pgEnum("goal_type", [
+  "weight_target",
+  "measurement_target",
+  "exercise_pr",
+  "custom",
+]);
+
+export const goalStatusEnum = pgEnum("goal_status", ["active", "achieved", "abandoned"]);

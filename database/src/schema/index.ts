@@ -11,3 +11,6 @@ export * from "./exerciseLibrary";
 export * from "./workouts";
 export * from "./workoutSessions";
 export * from "./aiAgentRuns";
+export * from "./dailyCheckins";
+export * from "./measurements";
+export * from "./smartGoals";

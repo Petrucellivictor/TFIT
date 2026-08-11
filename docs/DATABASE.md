@@ -6,7 +6,7 @@ Conventions:
 - Every table: `id uuid primary key default gen_random_uuid()`, `created_at timestamptz default now()`, `updated_at timestamptz default now()` (unless noted).
 - Soft-delete (`deleted_at timestamptz`) on user-generated content tables (`posts`, `post_comments`, ...) so moderation/audit can reason about history; hard-delete only on explicit account-deletion (LGPD right to erasure) flows.
 - Foreign keys `on delete cascade` for strictly-owned children (e.g. `post_media` → `posts`); `on delete restrict` or nullable FK where the parent must survive (e.g. `workout_sessions.workout_plan_id` after a plan is edited).
-- All health-related columns (`user_health_profiles`, `body_metrics`, `recovery_data`) are covered by row-level access control at the API layer — only the owning user and, in future, an explicitly-authorized professional can read them. See `SECURITY.md`.
+- All health-related columns (`user_health_profiles`, `body_metrics`, `daily_checkins`, `measurements`) are covered by row-level access control at the API layer — only the owning user and, in future, an explicitly-authorized professional can read them. See `SECURITY.md`.
 
 ## Phase 1 (implemented now) — Foundation
 
@@ -34,9 +34,15 @@ Conventions:
 | `personal_records` | Best weight×reps per user per exercise. |
 | `ai_agent_runs` | Generic observability log for every agent call (agent name, model, tokens, latency, success/failure) — consolidates the master spec's `ai_recommendations`/`ai_workout_reviews` for now; split those out once a feature needs to query them independently of raw call logs. |
 
-## Phase 3 — Evolution
+## Phase 3 (implemented now) — Evolution
 
-`daily_checkins`, `recovery_data`, `measurements`, `progression_history`, `goals`.
+| Table | Purpose |
+|---|---|
+| `daily_checkins` | One row per user per day: energy, sleep quality, disposition, and recovery perception (all 1-5), plus a pain flag/notes (master spec §17). The master spec's `recovery_data` is folded in here rather than a separate table — it's collected in the same daily flow and would otherwise just duplicate these same fields with an extra join. |
+| `measurements` | Body circumference time series (waist/chest/hip/arm/thigh/calf/shoulder, all nullable — log what you measure). Distinct from `body_metrics` (weight/height/body fat), which already existed from Phase 1 and now also gets a write endpoint for ongoing weight tracking, not just the onboarding snapshot. |
+| `goals` | User-defined SMART goals (weight target, measurement target, exercise PR target, or freeform), with status tracking. Distinct from `user_goals` (Phase 1's onboarding objective picklist — "hypertrophy", "lose weight", etc.) which stays as-is. |
+
+The master spec's `progression_history` isn't a physical table: strength progression over time is a query over the Phase 2 `exercise_sets`/`personal_records` tables that already hold the raw facts (`GET /api/progress` computes it) — storing it again separately would just be a sync hazard.
 
 ## Phase 4 — Gamification
 

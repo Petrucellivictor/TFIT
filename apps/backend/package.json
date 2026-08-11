@@ -13,6 +13,7 @@
     "@clerk/nextjs": "^7.7.3",
     "@tfit/ai": "*",
     "@tfit/database": "*",
+    "@tfit/fitness-engine": "*",
     "@tfit/types": "*",
     "@tfit/validation": "*",
     "drizzle-orm": "^0.45.2",
