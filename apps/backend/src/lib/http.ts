@@ -9,13 +9,15 @@ export function jsonError(code: string, message: string, status: number) {
 }
 
 export const errors = {
-  unauthorized: () => jsonError("unauthorized", "You need to be signed in to do that.", 401),
-  notFound: (message = "We couldn't find that.") => jsonError("not_found", message, 404),
+  unauthorized: () => jsonError("unauthorized", "Você precisa estar conectado para fazer isso.", 401),
+  notFound: (message = "Não encontramos o que você procurava.") => jsonError("not_found", message, 404),
   validation: (message: string) => jsonError("validation_error", message, 400),
   internal: () =>
     jsonError(
       "internal_error",
-      "Something went wrong on our end. Your data is safe — please try again.",
+      "Algo deu errado do nosso lado. Seus dados estão seguros — tente novamente.",
       500,
     ),
 };
+
+export const ACCOUNT_PROVISIONING_MESSAGE = "Sua conta ainda está sendo configurada. Tente novamente em instantes.";

@@ -37,3 +37,13 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 | `POST` | `/api/webhooks/clerk` | Sync `users`/`profiles` on Clerk create/update/delete |
 | `GET` | `/api/me` | Current user's profile + preferences + onboarding status |
 | `POST` | `/api/onboarding` | Submit onboarding data (goals, health flags, body metrics, preferences) |
+
+## Phase 2 endpoints (implemented)
+
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/api/training/generate` | Runs the full agent pipeline (`@tfit/ai`) and persists an approved plan as the user's new active `workout_plans` row. Rate-limited (5/hour/user via a Postgres-backed interim limiter — see `src/lib/rateLimit.ts`). Returns `422 generation_failed` with a friendly reason if the pipeline exhausts its retry budget. |
+| `GET` | `/api/workouts` | The user's current active plan with full workout/exercise detail (`{ plan: null }` if none generated yet). |
+| `POST` | `/api/workouts/sessions` | Start a workout session (`{ workoutId }`) — verifies the workout belongs to the caller's own plan. |
+| `POST` | `/api/workouts/sessions/:id/sets` | Log a completed set (`{ workoutExerciseId, setNumber, repsCompleted, weightKg?, feedback? }`); flags `isNewPersonalRecord`. |
+| `POST` | `/api/workouts/sessions/:id/complete` | Mark a session completed. |

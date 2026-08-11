@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { getDb, users, profiles, userPreferences, userGoals, trainingPreferences } from "@tfit/database";
-import { errors, jsonOk } from "@/lib/http";
+import { ACCOUNT_PROVISIONING_MESSAGE, errors, jsonOk } from "@/lib/http";
 import type { MeResponse } from "@tfit/types";
 
 export async function GET() {
@@ -10,7 +10,7 @@ export async function GET() {
 
   const db = getDb();
   const user = await db.query.users.findFirst({ where: eq(users.clerkId, clerkId) });
-  if (!user) return errors.notFound("Your account is still being set up. Try again in a moment.");
+  if (!user) return errors.notFound(ACCOUNT_PROVISIONING_MESSAGE);
 
   const [profile, preferences, goals, training] = await Promise.all([
     db.query.profiles.findFirst({ where: eq(profiles.userId, user.id) }),
@@ -20,7 +20,7 @@ export async function GET() {
   ]);
 
   if (!profile || !preferences) {
-    return errors.notFound("Your account is still being set up. Try again in a moment.");
+    return errors.notFound(ACCOUNT_PROVISIONING_MESSAGE);
   }
 
   const response: MeResponse = {

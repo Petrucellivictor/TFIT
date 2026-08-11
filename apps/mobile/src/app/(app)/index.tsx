@@ -1,8 +1,10 @@
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useMe } from "@/hooks/useMe";
+import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
 
 function greeting() {
   const hour = new Date().getHours();
@@ -11,9 +13,19 @@ function greeting() {
   return "Boa noite";
 }
 
+/** Our workouts use 1=Monday..7=Sunday; JS Date#getDay() uses 0=Sunday..6=Saturday. */
+function isoDayOfWeek(date: Date): number {
+  const jsDay = date.getDay();
+  return jsDay === 0 ? 7 : jsDay;
+}
+
 export default function HomeScreen() {
   const theme = useTheme();
   const me = useMe();
+  const plan = useWorkoutPlan();
+  const router = useRouter();
+
+  const todayWorkout = plan.data?.plan?.workouts.find((w) => w.dayOfWeek === isoDayOfWeek(new Date()));
 
   return (
     <Screen>
@@ -28,18 +40,37 @@ export default function HomeScreen() {
           </Text>
         )}
 
-        <Surface
-          level="raised"
-          style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}
-        >
-          <Ionicons name="barbell-outline" size={28} color={theme.colors.text.secondary} />
-          <Text variant="bodyStrong" style={{ textAlign: "center" }}>
-            Seu primeiro treino chega na próxima fase
-          </Text>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Estamos com sua avaliação em mãos. A geração de treinos com IA é o próximo passo do App Fit.
-          </Text>
-        </Surface>
+        {!plan.data?.plan ? (
+          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
+            <Ionicons name="barbell-outline" size={28} color={theme.colors.text.secondary} />
+            <Text variant="bodyStrong" style={{ textAlign: "center" }}>
+              Seu treino ainda não foi gerado
+            </Text>
+            <Text color="secondary" style={{ textAlign: "center" }}>
+              Toque em “Treinos” para gerar seu plano personalizado com IA.
+            </Text>
+          </Surface>
+        ) : todayWorkout ? (
+          <Pressable onPress={() => router.push(`/(app)/treinos/${todayWorkout.id}`)}>
+            <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.xxs }}>
+              <Text variant="label" color="secondary">
+                TREINO DE HOJE
+              </Text>
+              <Text variant="headline">{todayWorkout.name}</Text>
+              <Text color="secondary">{todayWorkout.exercises.length} exercícios</Text>
+            </Surface>
+          </Pressable>
+        ) : (
+          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
+            <Ionicons name="checkmark-circle-outline" size={28} color={theme.colors.text.secondary} />
+            <Text variant="bodyStrong" style={{ textAlign: "center" }}>
+              Sem treino hoje
+            </Text>
+            <Text color="secondary" style={{ textAlign: "center" }}>
+              Aproveite para descansar ou veja seus outros treinos da semana.
+            </Text>
+          </Surface>
+        )}
       </Stack>
     </Screen>
   );

@@ -1,0 +1,20 @@
+{
+  "name": "@tfit/ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ai": "^6",
+    "zod": "^3",
+    "@tfit/database": "*",
+    "@tfit/fitness-engine": "*",
+    "@tfit/types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

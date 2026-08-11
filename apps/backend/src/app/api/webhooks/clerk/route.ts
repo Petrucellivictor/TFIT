@@ -1,46 +1,17 @@
-import { Webhook } from "svix";
-import { headers } from "next/headers";
+import type { NextRequest } from "next/server";
+import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { getDb, users, profiles, userPreferences } from "@tfit/database";
 import { eq } from "drizzle-orm";
 import { jsonError, jsonOk } from "@/lib/http";
-
-interface ClerkUserPayload {
-  id: string;
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  image_url: string | null;
-}
 
 /**
  * Keeps our `users`/`profiles`/`user_preferences` rows in sync with Clerk,
  * which owns the actual identity/auth surface. See docs/SECURITY.md.
  */
-export async function POST(req: Request) {
-  const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
-  if (!signingSecret) {
-    return jsonError("misconfigured", "Webhook signing secret is not configured.", 500);
-  }
-
-  const headerPayload = await headers();
-  const svixId = headerPayload.get("svix-id");
-  const svixTimestamp = headerPayload.get("svix-timestamp");
-  const svixSignature = headerPayload.get("svix-signature");
-
-  if (!svixId || !svixTimestamp || !svixSignature) {
-    return jsonError("invalid_signature", "Missing svix headers.", 400);
-  }
-
-  const body = await req.text();
-  const webhook = new Webhook(signingSecret);
-
-  let event: { type: string; data: ClerkUserPayload };
+export async function POST(req: NextRequest) {
+  let event;
   try {
-    event = webhook.verify(body, {
-      "svix-id": svixId,
-      "svix-timestamp": svixTimestamp,
-      "svix-signature": svixSignature,
-    }) as typeof event;
+    event = await verifyWebhook(req);
   } catch {
     return jsonError("invalid_signature", "Webhook signature verification failed.", 400);
   }
@@ -70,7 +41,7 @@ export async function POST(req: Request) {
           userId: insertedUser.id,
           handle,
           displayName,
-          avatarUrl: clerkUser.image_url,
+          avatarUrl: clerkUser.image_url ?? null,
         })
         .onConflictDoNothing({ target: profiles.userId });
 
@@ -81,8 +52,9 @@ export async function POST(req: Request) {
       break;
     }
     case "user.deleted": {
-      const clerkUser = event.data;
-      await db.delete(users).where(eq(users.clerkId, clerkUser.id));
+      if (event.data.id) {
+        await db.delete(users).where(eq(users.clerkId, event.data.id));
+      }
       break;
     }
     default:

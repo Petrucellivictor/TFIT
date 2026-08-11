@@ -28,3 +28,31 @@ export const equipmentPreferenceEnum = pgEnum("equipment_preference", [
 export const unitSystemEnum = pgEnum("unit_system", ["metric", "imperial"]);
 
 export const themePreferenceEnum = pgEnum("theme_preference", ["light", "dark", "system"]);
+
+export const muscleGroupEnum = pgEnum("muscle_group", [
+  "chest",
+  "back",
+  "shoulders",
+  "biceps",
+  "triceps",
+  "quadriceps",
+  "hamstrings",
+  "glutes",
+  "calves",
+  "abs",
+  "forearms",
+  "full_body",
+  "cardio",
+]);
+
+export const exerciseLevelEnum = pgEnum("exercise_level", ["beginner", "intermediate", "advanced"]);
+
+export const workoutPlanStatusEnum = pgEnum("workout_plan_status", ["active", "archived"]);
+
+export const workoutSessionStatusEnum = pgEnum("workout_session_status", [
+  "in_progress",
+  "completed",
+  "abandoned",
+]);
+
+export const setFeedbackEnum = pgEnum("set_feedback", ["easy", "adequate", "hard", "very_hard"]);

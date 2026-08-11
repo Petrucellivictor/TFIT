@@ -13,7 +13,9 @@
 
 ## Database migrations
 
-`database/` holds Drizzle schema + generated SQL migrations. Flow: edit schema → `drizzle-kit generate` → review the generated SQL → `drizzle-kit migrate` (or `push` for the very first bootstrap of an empty database) against the target Neon branch. Migrations are committed to the repo and applied the same way in every environment — never a manual schema edit in the Neon console.
+`database/` holds Drizzle schema + generated SQL migrations. Flow: edit schema → `drizzle-kit generate` → review the generated SQL → `drizzle-kit migrate` against the target Neon branch. Migrations are committed to the repo and applied the same way in every environment — never a manual schema edit in the Neon console.
+
+**Current dev database status**: the single shared dev database was bootstrapped with `drizzle-kit push` before any migration existed (Phase 1), then Phase 2's additions were also applied with `push` rather than `migrate` — the generated `0000_*` migration is a full-schema baseline (enums included), and replaying it with `migrate` against a DB that already has those enums fails (`CREATE TYPE` has no `IF NOT EXISTS`). Keep using `push` against this dev database until it's reset or a second (e.g. preview/CI) database exists to actually exercise `migrate` from a clean state — at that point switch fully to generate+migrate and stop using push.
 
 ## Rollback
 

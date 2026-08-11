@@ -21,9 +21,18 @@ Conventions:
 | `body_metrics` | Weight/height/age/measurements time series (age is self-reported per entry, not derived from a birth date), used to derive BMI trend (never shown as a diagnosis). |
 | `audit_logs` | Append-only log of security-relevant events (login, data export, data deletion, permission changes). |
 
-## Phase 2 — Fitness core
+## Phase 2 (implemented now) — Fitness core
 
-`exercise_library`, `exercise_variations`, `exercise_muscles`, `exercise_equipment`, `exercise_restrictions`, `exercise_media`, `exercise_animations`, `workout_plans`, `workouts`, `workout_exercises`, `exercise_sets`, `workout_sessions`, `workout_history`, `personal_records`, `ai_recommendations`, `ai_workout_reviews`.
+| Table | Purpose |
+|---|---|
+| `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred to Phase 6 (3D/Motion), which is where media actually gets produced. |
+| `workout_plans` | A generated plan: split name, days/week, status, and the "why this workout" reasoning text (master spec §13). |
+| `workouts` | One training day within a plan. |
+| `workout_exercises` | The exercise prescriptions (sets/reps/rest/order) within a workout. |
+| `workout_sessions` | An instance of actually doing a workout. |
+| `exercise_sets` | Logged sets within a session (reps, weight, feedback). Together with `workout_sessions`, this **is** the master spec's `workout_history` — not a separate table, to avoid duplicating the same facts twice. |
+| `personal_records` | Best weight×reps per user per exercise. |
+| `ai_agent_runs` | Generic observability log for every agent call (agent name, model, tokens, latency, success/failure) — consolidates the master spec's `ai_recommendations`/`ai_workout_reviews` for now; split those out once a feature needs to query them independently of raw call logs. |
 
 ## Phase 3 — Evolution
 

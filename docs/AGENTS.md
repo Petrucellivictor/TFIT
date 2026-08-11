@@ -53,10 +53,11 @@ Deterministic rules and cached assessment→plan patterns are tried before any L
 
 ## Prompt versioning
 
-Each `agents/<name>/` folder (created in this pass) holds:
+Each `agents/<name>/` folder holds:
 ```
 agents/<name>/
   README.md       role, input schema, output schema, hard constraints
-  prompt.v1.md     the actual system prompt (added when Phase 2 implements the call)
+  prompt.v1.md     the versioned, human-reviewable copy of the system prompt
 ```
-Prompts are never inlined in application code.
+
+**Revised in Phase 2**: the original plan was to have route handlers read `prompt.v1.md` from disk at request time. That doesn't survive Vercel's serverless bundling — `fs.readFileSync` with a monorepo-relative path built from `process.cwd()` isn't statically traceable, so the file silently isn't included in the deployed function and the read fails in production while working fine locally. Instead, each prompt's actual runtime value is an exported string constant in `packages/ai/src/agents/<name>.ts`, bundled normally like any other code. `prompt.v1.md` stays as the versioned copy for human review/diffing; the two are kept in sync by editing both together (a comment in each `.ts` file points back to its `.md`).

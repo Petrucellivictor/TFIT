@@ -10,7 +10,7 @@ import {
   bodyMetrics,
   auditLogs,
 } from "@tfit/database";
-import { errors, jsonOk } from "@/lib/http";
+import { ACCOUNT_PROVISIONING_MESSAGE, errors, jsonOk } from "@/lib/http";
 
 export async function POST(req: Request) {
   const { userId: clerkId } = await auth();
@@ -18,13 +18,13 @@ export async function POST(req: Request) {
 
   const parsed = onboardingPayloadSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return errors.validation(parsed.error.issues[0]?.message ?? "Invalid onboarding data.");
+    return errors.validation(parsed.error.issues[0]?.message ?? "Dados de onboarding inválidos.");
   }
   const input = parsed.data;
 
   const db = getDb();
   const user = await db.query.users.findFirst({ where: eq(users.clerkId, clerkId) });
-  if (!user) return errors.notFound("Your account is still being set up. Try again in a moment.");
+  if (!user) return errors.notFound(ACCOUNT_PROVISIONING_MESSAGE);
 
   await db.transaction(async (tx) => {
     await tx

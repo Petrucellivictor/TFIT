@@ -7,3 +7,7 @@ export * from "./health";
 export * from "./trainingPreferences";
 export * from "./bodyMetrics";
 export * from "./auditLogs";
+export * from "./exerciseLibrary";
+export * from "./workouts";
+export * from "./workoutSessions";
+export * from "./aiAgentRuns";

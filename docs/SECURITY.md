@@ -6,7 +6,7 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 - Mobile stores the session token via the Clerk Expo SDK's built-in secure token cache (`@clerk/expo/token-cache`, backed by `expo-secure-store`) — never `AsyncStorage`.
 - `src/proxy.ts` runs `clerkMiddleware()` on every request only to establish the auth context (so `auth()` is available downstream) — it does **not** decide authorization. Path-matching authorization (`createRouteMatcher` + `auth.protect()` in middleware) is deprecated by Clerk in favor of resource-based checks: every route handler that needs a signed-in user calls `auth()` itself and returns 401 via `errors.unauthorized()` (see `src/lib/http.ts`). This avoids the exact failure mode path-matching has — a route whose matcher pattern silently stops covering it.
-- Rate limiting on auth-adjacent and AI endpoints via Upstash `Ratelimit` — sliding window, keyed by user ID (authenticated) or IP (pre-auth).
+- Rate limiting on AI endpoints: `POST /api/training/generate` is capped at 5/hour/user. Upstash `Ratelimit` is the intended implementation (docs/ARCHITECTURE.md), but the Upstash Marketplace integration is still pending browser terms acceptance (same blocker Neon/Clerk had initially) — `src/lib/rateLimit.ts` implements the same cap via a Postgres count query over `ai_agent_runs` as a real, working interim measure, not a placeholder. Swap the implementation once Upstash is provisioned; call sites won't change.
 
 ## Data classification
 
