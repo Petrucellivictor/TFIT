@@ -1,0 +1,10 @@
+{
+  "extends": "../config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "lib": ["ES2022"],
+    "types": ["react"]
+  },
+  "include": ["src"]
+}
