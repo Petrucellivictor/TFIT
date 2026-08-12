@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { Button, Stack, Text, useTheme } from "@tfit/ui";
+import { CircularTimer } from "./CircularTimer";
 
 export function RestTimer({ seconds, onDone }: { seconds: number; onDone: () => void }) {
   const theme = useTheme();
@@ -20,7 +22,12 @@ export function RestTimer({ seconds, onDone }: { seconds: number; onDone: () => 
       <Text variant="label" color="secondary">
         DESCANSO
       </Text>
-      <Text style={{ fontSize: 64, fontWeight: "700", color: theme.colors.accent.primary }}>{remaining}s</Text>
+      <View style={{ alignItems: "center", justifyContent: "center" }}>
+        <CircularTimer progress={seconds > 0 ? remaining / seconds : 0} size={200} strokeWidth={12} />
+        <Text style={{ position: "absolute", fontSize: 56, fontWeight: "700", color: theme.colors.accent.primary }}>
+          {remaining}s
+        </Text>
+      </View>
       <Button label="Pular descanso" variant="secondary" onPress={onDone} />
     </Stack>
   );

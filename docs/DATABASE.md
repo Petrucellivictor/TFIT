@@ -25,7 +25,7 @@ Conventions:
 
 | Table | Purpose |
 |---|---|
-| `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred to Phase 7 (3D/Motion), which is where media actually gets produced. |
+| `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred until real demonstration content (video/3D) and an admin upload pipeline both exist — Phase 7 shipped the achievable "Motion" half (animation/microinteractions, docs/ARCHITECTURE.md) without fabricating placeholder media plumbing; this now folds into Phase 9 alongside the admin panel. |
 | `workout_plans` | A plan: split name, days/week, status, and the "why this workout" reasoning text (master spec §13; nullable — only AI-generated plans have one, see Phase 5). |
 | `workouts` | One training day within a plan. |
 | `workout_exercises` | The exercise prescriptions (sets/reps/rest/order) within a workout. |

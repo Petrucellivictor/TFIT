@@ -25,9 +25,9 @@ Dark mode is a first-class design, not an inverted palette: separate contrast/el
 
 ## Motion & 3D budget (master spec §28/§32)
 
-- Reanimated for UI-thread microinteractions (set completion, XP gain, streak flame, level-up).
-- Skia reserved for the exercise 3D/illustrative demonstrations (Phase 6) and trophy/badge rendering — never for routine list/card transitions.
-- Every animated component ships a reduced-motion fallback and is profiled on a low-end Android target before merging (performance budget, not a suggestion).
+- Reanimated for UI-thread microinteractions (set completion, XP gain, streak flame, level-up, like-button burst) — implemented in Phase 7 for the rest timer, XP/FIT Score bars, achievement unlock celebration, and badge entrance animation.
+- `react-native-svg` (+ Reanimated's `useAnimatedProps`) for the one genuinely circular/vector shape needed so far — the rest-timer progress ring — rather than pulling in Skia for a single use case. Skia stays reserved for actual exercise 3D/illustrative demonstrations, which are still deferred (Phase 9, docs/ARCHITECTURE.md) pending real content and an admin upload pipeline; no placeholder 3D work was built to fill the phase number.
+- Every animated component ships a reduced-motion fallback and is profiled on a low-end Android target before merging (performance budget, not a suggestion). The Phase 7 components (rest-timer ring, progress bars, achievement entrance, celebration modal, like-button burst) all check `theme.reducedMotion` and snap instead of animating when it's on.
 
 ## Screen state contract
 

@@ -2,9 +2,11 @@ import { useState } from "react";
 import { ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
+import type { GamificationEventResult } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { ScaleSelector } from "@/components/ScaleSelector";
 import { Chip } from "@/components/Chip";
+import { GamificationCelebration } from "@/components/GamificationCelebration";
 import { useSubmitCheckin } from "@/hooks/useEvolution";
 import { ApiRequestError } from "@/lib/api";
 
@@ -19,6 +21,7 @@ export default function CheckinScreen() {
   const [recoveryPerception, setRecoveryPerception] = useState<number | null>(null);
   const [hasPain, setHasPain] = useState(false);
   const [painNotes, setPainNotes] = useState("");
+  const [gamification, setGamification] = useState<GamificationEventResult | null>(null);
 
   const canSubmit = energyLevel && sleepQuality && disposition && recoveryPerception;
 
@@ -26,7 +29,13 @@ export default function CheckinScreen() {
     if (!canSubmit) return;
     submitCheckin.mutate(
       { energyLevel, sleepQuality, disposition, recoveryPerception, hasPain, painNotes: painNotes || undefined },
-      { onSuccess: () => router.back() },
+      {
+        onSuccess: (res) => {
+          const hasCelebration = res.gamification.xpAwarded > 0 || res.gamification.newAchievements.length > 0;
+          if (hasCelebration) setGamification(res.gamification);
+          else router.back();
+        },
+      },
     );
   };
 
@@ -75,6 +84,13 @@ export default function CheckinScreen() {
           disabled={!canSubmit || submitCheckin.isPending}
         />
       </ScrollView>
+      <GamificationCelebration
+        result={gamification}
+        onDismiss={() => {
+          setGamification(null);
+          router.back();
+        }}
+      />
     </Screen>
   );
 }

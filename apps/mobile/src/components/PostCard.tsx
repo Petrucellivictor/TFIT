@@ -1,6 +1,7 @@
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { Stack, Surface, Text, useTheme } from "@tfit/ui";
 import type { PostSummary } from "@tfit/types";
 import { Avatar } from "./Avatar";
@@ -12,6 +13,41 @@ const POST_TYPE_LABEL: Partial<Record<PostSummary["type"], string>> = {
   personal_record: "Novo recorde pessoal",
   streak: "Sequência em dia",
 };
+
+function LikeButton({ liked, count, onToggle }: { liked: boolean; count: number; onToggle: () => void }) {
+  const theme = useTheme();
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  // Reanimated shared values are mutated by design outside React's render
+  // cycle — the eslint-plugin-react-hooks immutability rule doesn't know
+  // that yet, so it's disabled for this handler.
+  /* eslint-disable react-hooks/immutability */
+  const handlePress = () => {
+    if (!theme.reducedMotion) {
+      scale.value = withSequence(withTiming(1.3, { duration: 100 }), withSpring(1, { damping: 8 }));
+    }
+    onToggle();
+  };
+  /* eslint-enable react-hooks/immutability */
+
+  return (
+    <Pressable onPress={handlePress} hitSlop={8}>
+      <Stack direction="row" gap="xxs" align="center">
+        <Animated.View style={animatedStyle}>
+          <Ionicons
+            name={liked ? "heart" : "heart-outline"}
+            size={22}
+            color={liked ? theme.colors.feedback.danger : theme.colors.text.secondary}
+          />
+        </Animated.View>
+        <Text variant="caption" color="secondary">
+          {count}
+        </Text>
+      </Stack>
+    </Pressable>
+  );
+}
 
 export function PostCard({
   post,
@@ -73,18 +109,7 @@ export function PostCard({
       ) : null}
 
       <Stack direction="row" gap="lg" align="center" style={{ padding: theme.space.md }}>
-        <Pressable onPress={onToggleLike} hitSlop={8}>
-          <Stack direction="row" gap="xxs" align="center">
-            <Ionicons
-              name={post.likedByViewer ? "heart" : "heart-outline"}
-              size={22}
-              color={post.likedByViewer ? theme.colors.feedback.danger : theme.colors.text.secondary}
-            />
-            <Text variant="caption" color="secondary">
-              {post.likeCount}
-            </Text>
-          </Stack>
-        </Pressable>
+        <LikeButton liked={post.likedByViewer} count={post.likeCount} onToggle={onToggleLike} />
         <Pressable onPress={onPress} hitSlop={8}>
           <Stack direction="row" gap="xxs" align="center">
             <Ionicons name="chatbubble-outline" size={20} color={theme.colors.text.secondary} />
