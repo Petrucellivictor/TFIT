@@ -10,7 +10,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "expo-linear-gradient": "*"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

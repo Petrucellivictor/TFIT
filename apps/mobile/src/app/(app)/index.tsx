@@ -1,9 +1,10 @@
-import { ActivityIndicator, Pressable } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
-import { ScoreBar } from "@/components/ScoreBar";
+import { RadialGauge } from "@/components/RadialGauge";
 import { useMe } from "@/hooks/useMe";
 import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
 import { useGamificationProfile } from "@/hooks/useGamification";
@@ -21,6 +22,42 @@ function isoDayOfWeek(date: Date): number {
   return jsDay === 0 ? 7 : jsDay;
 }
 
+function HeroHeader({ name, isLoading, isError }: { name: string | undefined; isLoading: boolean; isError: boolean }) {
+  const theme = useTheme();
+
+  return (
+    <LinearGradient
+      colors={theme.colors.gradient.hero}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ padding: theme.space.lg, borderRadius: theme.radius.soft, gap: theme.space.xxs, overflow: "hidden" }}
+    >
+      <Stack direction="row" gap="xs" align="center">
+        <View
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: theme.radius.pill,
+            backgroundColor: theme.colors.accent.primary,
+          }}
+        />
+        <Text variant="label" style={{ color: theme.colors.accent.primary, letterSpacing: 1 }}>
+          TFIT PERFORMANCE
+        </Text>
+      </Stack>
+      {isLoading ? (
+        <ActivityIndicator color={theme.colors.accent.primary} style={{ alignSelf: "flex-start", marginTop: theme.space.xs }} />
+      ) : isError ? (
+        <Text color="inverse">Não conseguimos carregar seus dados agora. Puxe para atualizar.</Text>
+      ) : (
+        <Text variant="title" color="inverse">
+          {greeting()}, {name}
+        </Text>
+      )}
+    </LinearGradient>
+  );
+}
+
 function GamificationSummary() {
   const theme = useTheme();
   const router = useRouter();
@@ -36,21 +73,27 @@ function GamificationSummary() {
       accessibilityRole="button"
       accessibilityLabel="Ver conquistas e progresso"
     >
-      <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.sm }}>
-        <Stack direction="row" justify="space-between" align="center">
-          <Stack direction="row" gap="xs" align="center">
-            <Text variant="bodyStrong">
-              Nível {level} — {name}
+      <Surface level="raised" bordered glow style={{ padding: theme.space.md }}>
+        <Stack direction="row" align="center" gap="md">
+          <RadialGauge value={progressPercent} size={72} strokeWidth={7} valueLabel={`${level}`} />
+          <Stack gap="xxs" style={{ flex: 1 }}>
+            <Text variant="label" color="secondary" style={{ letterSpacing: 0.6 }}>
+              NÍVEL {level}
+            </Text>
+            <Text variant="headline">{name}</Text>
+            <Text variant="caption" color="secondary">
+              {isMaxLevel ? "Nível máximo alcançado" : `${xpIntoLevel} / ${xpForNextLevel} XP`}
             </Text>
           </Stack>
           {streak.current > 0 ? (
-            <Stack direction="row" gap="xxs" align="center">
-              <Text>🔥</Text>
-              <Text variant="bodyStrong">{streak.current}</Text>
-            </Stack>
+            <Surface level="sunken" radius="pill" style={{ paddingVertical: theme.space.xxs, paddingHorizontal: theme.space.sm }}>
+              <Stack direction="row" gap="xxs" align="center">
+                <Text>🔥</Text>
+                <Text variant="bodyStrong">{streak.current}</Text>
+              </Stack>
+            </Surface>
           ) : null}
         </Stack>
-        {!isMaxLevel ? <ScoreBar label={`${xpIntoLevel} / ${xpForNextLevel} XP`} value={progressPercent} /> : null}
       </Surface>
     </Pressable>
   );
@@ -66,22 +109,14 @@ export default function HomeScreen() {
 
   return (
     <Screen>
-      <Stack gap="lg" style={{ flex: 1, padding: 24 }}>
-        {me.isLoading ? (
-          <ActivityIndicator />
-        ) : me.isError ? (
-          <Text color="secondary">Não conseguimos carregar seus dados agora. Puxe para atualizar.</Text>
-        ) : (
-          <Text variant="title">
-            {greeting()}, {me.data?.profile.displayName.split(" ")[0]}
-          </Text>
-        )}
+      <ScrollView contentContainerStyle={{ padding: 24, gap: theme.space.lg }}>
+        <HeroHeader name={me.data?.profile.displayName.split(" ")[0]} isLoading={me.isLoading} isError={me.isError} />
 
         <GamificationSummary />
 
         {!plan.data?.plan ? (
-          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
-            <Ionicons name="barbell-outline" size={28} color={theme.colors.text.secondary} />
+          <Surface level="raised" bordered style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
+            <Ionicons name="barbell-outline" size={28} color={theme.colors.accent.primary} />
             <Text variant="bodyStrong" style={{ textAlign: "center" }}>
               Seu treino ainda não foi gerado
             </Text>
@@ -91,17 +126,36 @@ export default function HomeScreen() {
           </Surface>
         ) : todayWorkout ? (
           <Pressable onPress={() => router.push(`/(app)/treinos/${todayWorkout.id}`)}>
-            <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.xxs }}>
-              <Text variant="label" color="secondary">
-                TREINO DE HOJE
-              </Text>
-              <Text variant="headline">{todayWorkout.name}</Text>
-              <Text color="secondary">{todayWorkout.exercises.length} exercícios</Text>
+            <Surface level="raised" bordered style={{ padding: theme.space.lg, gap: theme.space.sm }}>
+              <Stack direction="row" align="center" gap="md">
+                <LinearGradient
+                  colors={theme.colors.gradient.primary}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: theme.radius.soft,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="flash" size={24} color={theme.colors.accent.onPrimary} />
+                </LinearGradient>
+                <Stack gap="xxs" style={{ flex: 1 }}>
+                  <Text variant="label" color="secondary" style={{ letterSpacing: 0.6 }}>
+                    TREINO DE HOJE
+                  </Text>
+                  <Text variant="headline">{todayWorkout.name}</Text>
+                  <Text color="secondary">{todayWorkout.exercises.length} exercícios</Text>
+                </Stack>
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              </Stack>
             </Surface>
           </Pressable>
         ) : (
-          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
-            <Ionicons name="checkmark-circle-outline" size={28} color={theme.colors.text.secondary} />
+          <Surface level="raised" bordered style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>
+            <Ionicons name="checkmark-circle-outline" size={28} color={theme.colors.accent.primary} />
             <Text variant="bodyStrong" style={{ textAlign: "center" }}>
               Sem treino hoje
             </Text>
@@ -110,7 +164,7 @@ export default function HomeScreen() {
             </Text>
           </Surface>
         )}
-      </Stack>
+      </ScrollView>
     </Screen>
   );
 }

@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { Stack, Text, useTheme } from "@tfit/ui";
+
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export function ScoreBar({ label, value }: { label: string; value: number }) {
   const theme = useTheme();
@@ -31,11 +34,11 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
           overflow: "hidden",
         }}
       >
-        <Animated.View
-          style={[
-            { height: "100%", backgroundColor: theme.colors.accent.primary, borderRadius: theme.radius.pill },
-            animatedStyle,
-          ]}
+        <AnimatedLinearGradient
+          colors={theme.colors.gradient.primary}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[{ height: "100%", borderRadius: theme.radius.pill }, animatedStyle]}
         />
       </View>
     </Stack>

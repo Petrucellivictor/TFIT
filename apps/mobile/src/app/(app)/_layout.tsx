@@ -34,11 +34,31 @@ export default function AppLayout() {
           tabBarStyle: {
             backgroundColor: theme.colors.background.raised,
             borderTopColor: theme.colors.border.subtle,
+            height: 64,
+            paddingBottom: 8,
+            paddingTop: 8,
           },
-          tabBarIcon: ({ color, size, focused }) => {
+          tabBarIcon: ({ size, focused }) => {
             const base = TAB_ICONS[route.name] ?? "ellipse";
             const iconName = (focused ? base : `${base}-outline`) as keyof typeof Ionicons.glyphMap;
-            return <Ionicons name={iconName} color={color} size={size} />;
+            return (
+              <View
+                style={{
+                  width: 40,
+                  height: 32,
+                  borderRadius: theme.radius.pill,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: focused ? theme.colors.accent.primary : "transparent",
+                }}
+              >
+                <Ionicons
+                  name={iconName}
+                  color={focused ? theme.colors.accent.onPrimary : theme.colors.text.secondary}
+                  size={size - 2}
+                />
+              </View>
+            );
           },
         })}
       >

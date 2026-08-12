@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTheme } from "@tfit/ui";
@@ -37,21 +38,26 @@ export function FloatingActionButton({ onPress }: { onPress: () => void }) {
           position: "absolute",
           alignSelf: "center",
           bottom: 28,
-          width: 56,
-          height: 56,
+          width: 60,
+          height: 60,
           borderRadius: theme.radius.pill,
-          backgroundColor: theme.colors.accent.primary,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: "#000",
-          shadowOpacity: theme.scheme === "dark" ? 0.4 : 0.15,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 6,
+          overflow: "hidden",
+          shadowColor: theme.colors.accent.primary,
+          shadowOpacity: theme.scheme === "dark" ? 0.55 : 0.35,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 8 },
+          elevation: 8,
         },
       ]}
     >
-      <Ionicons name="add" size={28} color={theme.colors.accent.onPrimary} />
+      <LinearGradient
+        colors={theme.colors.gradient.primary}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}
+      >
+        <Ionicons name="add" size={30} color={theme.colors.accent.onPrimary} />
+      </LinearGradient>
     </AnimatedPressable>
   );
 }

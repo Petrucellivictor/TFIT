@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { ScoreBar } from "@/components/ScoreBar";
+import { RadialGauge } from "@/components/RadialGauge";
 import { Sparkline } from "@/components/Sparkline";
 import { useProgress } from "@/hooks/useEvolution";
 
@@ -55,16 +56,16 @@ export default function EvolutionScreen() {
           </Surface>
         ) : null}
 
-        <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.md }}>
-          <Stack direction="row" justify="space-between" align="center">
-            <Text variant="headline">FIT Score</Text>
-            <Text style={{ fontSize: 32, fontWeight: "700", color: theme.colors.accent.primary }}>
-              {fitScore.overall}
-            </Text>
+        <Surface level="raised" bordered glow style={{ padding: theme.space.lg, gap: theme.space.md }}>
+          <Stack direction="row" align="center" gap="lg">
+            <RadialGauge value={fitScore.overall} size={104} strokeWidth={10} />
+            <Stack gap="xxs" style={{ flex: 1 }}>
+              <Text variant="headline">FIT Score</Text>
+              <Text variant="caption" color="secondary">
+                Um indicador de consistência e evolução — não é um diagnóstico de saúde.
+              </Text>
+            </Stack>
           </Stack>
-          <Text variant="caption" color="secondary">
-            Um indicador de consistência e evolução — não é um diagnóstico de saúde.
-          </Text>
           <Stack gap="sm">
             <ScoreBar label="Consistência" value={fitScore.consistency} />
             <ScoreBar label="Treinamento" value={fitScore.training} />

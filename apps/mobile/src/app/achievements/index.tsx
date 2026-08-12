@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Modal, Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import { Stack, Surface, Text, useTheme } from "@tfit/ui";
@@ -7,29 +8,58 @@ import type { AchievementView } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { useAchievements } from "@/hooks/useGamification";
 
+const RING_WIDTH = 3;
+
 function AchievementBadgeIcon({ achievement, size }: { achievement: AchievementView; size: number }) {
   const theme = useTheme();
   const unlocked = achievement.unlockedAt !== null;
+  const icon = (
+    <Ionicons
+      name={achievement.icon as keyof typeof Ionicons.glyphMap}
+      size={Math.round(size * 0.46)}
+      color={unlocked ? theme.colors.accent.primary : theme.colors.text.disabled}
+    />
+  );
+
+  if (!unlocked) {
+    return (
+      <Surface
+        radius="pill"
+        style={{
+          width: size,
+          height: size,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          borderColor: theme.colors.border.subtle,
+        }}
+      >
+        {icon}
+      </Surface>
+    );
+  }
 
   return (
-    <Surface
-      radius="pill"
-      style={{
-        width: size,
-        height: size,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: unlocked ? theme.colors.accent.primaryMuted : "transparent",
-        borderWidth: unlocked ? 0 : 2,
-        borderColor: theme.colors.border.subtle,
-      }}
+    <LinearGradient
+      colors={theme.colors.gradient.primary}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ width: size, height: size, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center" }}
     >
-      <Ionicons
-        name={achievement.icon as keyof typeof Ionicons.glyphMap}
-        size={Math.round(size * 0.46)}
-        color={unlocked ? theme.colors.accent.primary : theme.colors.text.disabled}
-      />
-    </Surface>
+      <Surface
+        radius="pill"
+        style={{
+          width: size - RING_WIDTH * 2,
+          height: size - RING_WIDTH * 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: theme.colors.background.raised,
+        }}
+      >
+        {icon}
+      </Surface>
+    </LinearGradient>
   );
 }
 

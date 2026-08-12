@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, type PressableProps, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTheme } from "../theme/ThemeProvider";
 import { Text } from "./Text";
@@ -47,18 +48,45 @@ export function Button({ label, variant = "primary", onPressIn, onPressOut, disa
         animatedStyle,
         styles.base,
         {
-          backgroundColor: isPrimary ? theme.colors.accent.primary : theme.colors.background.sunken,
           borderRadius: theme.radius.soft,
-          paddingVertical: theme.space.sm,
-          paddingHorizontal: theme.space.lg,
           opacity: disabled ? 0.5 : 1,
+          overflow: "hidden",
+          backgroundColor: isPrimary ? undefined : theme.colors.background.sunken,
+          borderWidth: isPrimary ? 0 : 1,
+          borderColor: theme.colors.border.subtle,
         },
+        isPrimary && !disabled
+          ? {
+              shadowColor: theme.colors.accent.primary,
+              shadowOpacity: theme.scheme === "dark" ? 0.45 : 0.3,
+              shadowRadius: 14,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 8,
+            }
+          : null,
       ]}
       {...rest}
     >
-      <Text variant="bodyStrong" color={isPrimary ? "inverse" : "primary"} style={styles.label}>
-        {label}
-      </Text>
+      {isPrimary ? (
+        <LinearGradient
+          colors={theme.colors.gradient.primary}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.base, { paddingVertical: theme.space.sm, paddingHorizontal: theme.space.lg }]}
+        >
+          <Text variant="bodyStrong" color="inverse" style={styles.label}>
+            {label}
+          </Text>
+        </LinearGradient>
+      ) : (
+        <Text
+          variant="bodyStrong"
+          color="primary"
+          style={[styles.label, { paddingVertical: theme.space.sm, paddingHorizontal: theme.space.lg }]}
+        >
+          {label}
+        </Text>
+      )}
     </AnimatedPressable>
   );
 }

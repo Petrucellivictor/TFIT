@@ -1,6 +1,10 @@
 /**
  * Semantic color tokens. Components must reference these, never raw hex.
- * Dark mode is a deliberate palette, not an inversion — see docs/DESIGN_SYSTEM.md.
+ * "Performance Tech" identity (revised for a more elaborate, health/gym-tech
+ * feel — data-forward, wearable-inspired, not a generic pastel app):
+ * deep, near-black surfaces with a vivid electric mint/blue accent pairing
+ * used for gradients, glows, and data visualization (score rings, bars).
+ * Dark mode is the flagship, not an inversion of light — see docs/DESIGN_SYSTEM.md.
  */
 export interface ColorTokens {
   background: {
@@ -20,6 +24,7 @@ export interface ColorTokens {
   };
   accent: {
     primary: string;
+    secondary: string;
     primaryMuted: string;
     onPrimary: string;
   };
@@ -29,62 +34,77 @@ export interface ColorTokens {
     danger: string;
   };
   overlay: string;
+  /** Gradient stop pairs for CTAs, hero surfaces, and data-viz fills (LinearGradient / SVG). */
+  gradient: {
+    primary: readonly [string, string];
+    hero: readonly [string, string];
+  };
 }
 
 export const lightColors: ColorTokens = {
   background: {
-    base: "#F7F7F5",
+    base: "#F2F5F8",
     raised: "#FFFFFF",
-    sunken: "#EEEEEB",
+    sunken: "#E6ECF1",
   },
   text: {
-    primary: "#14151A",
-    secondary: "#5B5E68",
+    primary: "#0B1420",
+    secondary: "#57626F",
     inverse: "#FFFFFF",
-    disabled: "#A6A8B0",
+    disabled: "#9AA5B1",
   },
   border: {
-    subtle: "#E4E4E0",
-    strong: "#CFCFC9",
+    subtle: "#DDE4EA",
+    strong: "#C3CDD6",
   },
   accent: {
-    primary: "#0E7C61",
-    primaryMuted: "#DCEFE9",
+    primary: "#00B884",
+    secondary: "#0091FF",
+    primaryMuted: "#D9F5EC",
     onPrimary: "#FFFFFF",
   },
   feedback: {
-    success: "#1E8E5A",
+    success: "#1FAE6E",
     warning: "#B7791F",
-    danger: "#C0362C",
+    danger: "#E0303F",
   },
-  overlay: "rgba(20, 21, 26, 0.5)",
+  overlay: "rgba(6, 12, 18, 0.5)",
+  gradient: {
+    primary: ["#00B884", "#0091FF"],
+    hero: ["#0B1420", "#173049"],
+  },
 };
 
 export const darkColors: ColorTokens = {
   background: {
-    base: "#0E0F12",
-    raised: "#17181C",
-    sunken: "#0A0B0D",
+    base: "#060A10",
+    raised: "#101823",
+    sunken: "#03060A",
   },
   text: {
-    primary: "#F3F3F1",
-    secondary: "#A6A8B0",
-    inverse: "#14151A",
-    disabled: "#54565E",
+    primary: "#F3F7FA",
+    secondary: "#8A97A8",
+    inverse: "#04140F",
+    disabled: "#4C5866",
   },
   border: {
-    subtle: "#232428",
-    strong: "#34363B",
+    subtle: "#1C2733",
+    strong: "#2E3B49",
   },
   accent: {
-    primary: "#2FD9A6",
-    primaryMuted: "#173029",
+    primary: "#1EF2A6",
+    secondary: "#3DB2FF",
+    primaryMuted: "#0C3327",
     onPrimary: "#04140F",
   },
   feedback: {
-    success: "#3ECB8B",
-    warning: "#E0A93F",
-    danger: "#E5695F",
+    success: "#2FE38A",
+    warning: "#FFC24B",
+    danger: "#FF5C72",
   },
-  overlay: "rgba(0, 0, 0, 0.6)",
+  overlay: "rgba(2, 5, 9, 0.78)",
+  gradient: {
+    primary: ["#1EF2A6", "#3DB2FF"],
+    hero: ["#0B1420", "#0E2A3E"],
+  },
 };
