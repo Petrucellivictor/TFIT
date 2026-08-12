@@ -22,7 +22,11 @@ export function NotificationRow({ notification, onPress }: { notification: Notif
       : NOTIFICATION_COPY[notification.type](actorName);
 
   return (
-    <Pressable onPress={onPress}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={notification.isRead ? message : `${message}, não lida`}
+    >
       <Surface level={notification.isRead ? "base" : "raised"} style={{ padding: theme.space.md }}>
         <Stack direction="row" gap="sm" align="center">
           {notification.actor ? (

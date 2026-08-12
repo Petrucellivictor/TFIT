@@ -8,7 +8,12 @@ export function UserRow({ user, onPress, trailing }: { user: PostAuthor; onPress
   const theme = useTheme();
 
   return (
-    <Pressable onPress={onPress} disabled={!onPress}>
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={onPress ? `Abrir perfil de ${user.displayName}` : undefined}
+    >
       <Stack direction="row" align="center" justify="space-between" style={{ paddingVertical: theme.space.sm }}>
         <Stack direction="row" gap="sm" align="center" style={{ flex: 1 }}>
           <Avatar uri={user.avatarUrl} name={user.displayName} size={44} />

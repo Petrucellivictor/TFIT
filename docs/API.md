@@ -27,9 +27,10 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 ## Conventions
 
 - Every input validated against a `packages/validation` Zod schema; validation failure → `400` with a machine-readable error code, never a raw stack trace.
-- Every handler requires a Clerk session except the Clerk webhook (verified via svix signature) and `/api/health`.
+- Every handler requires a Clerk session except the Clerk webhook (verified via svix signature) and `/api/health`. This is enforced across every route and covered by an automated test (`apps/backend/src/authGating.test.ts`, added Phase 9) — see `docs/TESTING.md`.
 - Responses are JSON, camelCase, with a consistent envelope: `{ data }` on success, `{ error: { code, message } }` on failure. No bare arrays at the top level (breaks forward-compatible pagination).
 - Errors returned to the client are human, per master spec §45 — never `Internal Server Error` verbatim. Route handlers catch and translate; the raw error is only ever logged server-side.
+- Rate limiting (`src/lib/rateLimit.ts`): `/api/training/generate` (5/hour), and since Phase 9, `POST /api/posts` (20/hour), `POST /api/posts/:id/comments` (60/hour), `POST /api/follow/:userId` (100/hour), `POST /api/reports` (10/hour), `POST /api/professionals/me/services` (20/hour) — a `429 rate_limited` error via `errors.rateLimited()`. See `docs/SECURITY.md`.
 
 ## Phase 1 endpoints (implemented)
 

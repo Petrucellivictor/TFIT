@@ -80,10 +80,22 @@ function ServiceRow({
           ) : null}
         </Stack>
         <Stack gap="xxs" align="center">
-          <Pressable onPress={onMoveUp} disabled={isFirst} hitSlop={6}>
+          <Pressable
+            onPress={onMoveUp}
+            disabled={isFirst}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="Mover para cima"
+          >
             <Ionicons name="chevron-up" size={20} color={isFirst ? theme.colors.text.disabled : theme.colors.text.secondary} />
           </Pressable>
-          <Pressable onPress={onMoveDown} disabled={isLast} hitSlop={6}>
+          <Pressable
+            onPress={onMoveDown}
+            disabled={isLast}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="Mover para baixo"
+          >
             <Ionicons name="chevron-down" size={20} color={isLast ? theme.colors.text.disabled : theme.colors.text.secondary} />
           </Pressable>
         </Stack>

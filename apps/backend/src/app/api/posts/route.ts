@@ -3,10 +3,13 @@ import { createPostSchema } from "@tfit/validation";
 import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
 import { buildPostSummaries } from "@/lib/postSummary";
+import { isPostRateLimited } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   const result = await requireUser();
   if ("errorResponse" in result) return result.errorResponse;
+
+  if (await isPostRateLimited(result.user.id)) return errors.rateLimited("Você atingiu o limite de posts por hora.");
 
   const parsed = createPostSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return errors.validation(parsed.error.issues[0]?.message ?? "Dados inválidos.");

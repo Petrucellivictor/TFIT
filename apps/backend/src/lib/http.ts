@@ -12,6 +12,8 @@ export const errors = {
   unauthorized: () => jsonError("unauthorized", "Você precisa estar conectado para fazer isso.", 401),
   notFound: (message = "Não encontramos o que você procurava.") => jsonError("not_found", message, 404),
   validation: (message: string) => jsonError("validation_error", message, 400),
+  rateLimited: (message = "Você atingiu o limite de ações por hora. Tente novamente mais tarde.") =>
+    jsonError("rate_limited", message, 429),
   internal: () =>
     jsonError(
       "internal_error",

@@ -18,7 +18,7 @@ An AI personal-trainer, fitness-tracking, and fitness social network — mobile-
 
 ```
 apps/backend    Next.js API (Vercel)
-apps/admin      Next.js admin panel (Vercel, Phase 8 stub)
+apps/admin      Next.js admin panel (Phase 9 — reports queue; not yet its own Vercel project)
 apps/mobile     Expo React Native app
 packages/       Shared types, validation, design system, fitness engine, AI orchestration, gamification
 agents/         Per-agent design contracts (docs/AGENTS.md) and, from Phase 2, prompts
@@ -42,4 +42,4 @@ Each app also has its own `.env.local`, pulled from Vercel:
 cd apps/backend && vercel env pull --yes
 ```
 
-See `docs/DEPLOYMENT.md` for the full environment/provisioning story and `docs/ARCHITECTURE.md` §5 for the phase-by-phase build roadmap. **Phases 1-8** (Foundation, Fitness core, Evolution, Gamification, Professionals directory & manual/shared workouts, Social, Motion & badges, Professional service menu) are built; Neon, Clerk, and the exercise library are live. The AI Gateway calls are implemented and unit-tested but not yet exercised end-to-end — the Vercel account needs a credit card on file before the Gateway will serve requests (see `docs/SECURITY.md`).
+See `docs/DEPLOYMENT.md` for the full environment/provisioning story and `docs/ARCHITECTURE.md` §5 for the phase-by-phase build roadmap. **Phases 1-9** (Foundation, Fitness core, Evolution, Gamification, Professionals directory & manual/shared workouts, Social, Motion & badges, Professional service menu, Polish) are built; Neon, Clerk, and the exercise library are live. The AI Gateway calls are implemented and unit-tested but not yet exercised end-to-end — the Vercel account needs a credit card on file before the Gateway will serve requests (see `docs/SECURITY.md`).

@@ -31,7 +31,12 @@ function ShareModal({ planId, onClose }: { planId: string | null; onClose: () =>
 
   return (
     <Modal visible={planId !== null} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 24 }} onPress={onClose}>
+      <Pressable
+        style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 24 }}
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar"
+      >
         <Pressable onPress={(e) => e.stopPropagation()}>
           <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.md }}>
             <Text variant="headline">Enviar treino</Text>

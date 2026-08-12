@@ -84,7 +84,11 @@ export default function CreatePostScreen() {
       <Stack gap="lg" style={{ flex: 1, padding: 24 }}>
         <Text variant="title">Novo post</Text>
 
-        <Pressable onPress={pickImage}>
+        <Pressable
+          onPress={pickImage}
+          accessibilityRole="button"
+          accessibilityLabel={asset ? "Alterar foto" : "Escolher foto"}
+        >
           {asset ? (
             <Image source={{ uri: asset.uri }} style={{ width: "100%", aspectRatio: 1, borderRadius: theme.radius.soft }} />
           ) : (

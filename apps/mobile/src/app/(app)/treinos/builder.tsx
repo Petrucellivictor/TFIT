@@ -134,7 +134,13 @@ export default function WorkoutBuilderScreen() {
                 <TextField label={`Dia ${dayIndex + 1} — nome`} value={day.name} onChangeText={(v) => updateDay(day.key, { name: v })} />
               </Stack>
               {days.length > 1 ? (
-                <Pressable onPress={() => removeDay(day.key)} style={{ paddingLeft: theme.space.sm, paddingTop: theme.space.lg }}>
+                <Pressable
+                  onPress={() => removeDay(day.key)}
+                  style={{ paddingLeft: theme.space.sm, paddingTop: theme.space.lg }}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remover ${day.name}`}
+                >
                   <Ionicons name="trash-outline" size={20} color={theme.colors.feedback.danger} />
                 </Pressable>
               ) : null}
@@ -153,7 +159,12 @@ export default function WorkoutBuilderScreen() {
                     <Text variant="bodyStrong" style={{ flex: 1 }}>
                       {exercise.name}
                     </Text>
-                    <Pressable onPress={() => removeExercise(day.key, exercise.key)}>
+                    <Pressable
+                      onPress={() => removeExercise(day.key, exercise.key)}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remover ${exercise.name}`}
+                    >
                       <Ionicons name="close-circle-outline" size={20} color={theme.colors.text.secondary} />
                     </Pressable>
                   </Stack>

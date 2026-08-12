@@ -31,7 +31,11 @@ function GamificationSummary() {
   const progressPercent = isMaxLevel || !xpForNextLevel ? 100 : Math.round((xpIntoLevel / xpForNextLevel) * 100);
 
   return (
-    <Pressable onPress={() => router.push("/achievements")}>
+    <Pressable
+      onPress={() => router.push("/achievements")}
+      accessibilityRole="button"
+      accessibilityLabel="Ver conquistas e progresso"
+    >
       <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.sm }}>
         <Stack direction="row" justify="space-between" align="center">
           <Stack direction="row" gap="xs" align="center">

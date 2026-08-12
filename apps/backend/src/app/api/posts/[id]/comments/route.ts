@@ -7,6 +7,7 @@ import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
 import { getRelationship, notifyUser } from "@/lib/social";
 import { getVisiblePostById } from "@/lib/postSummary";
+import { isCommentRateLimited } from "@/lib/rateLimit";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUser();
@@ -48,6 +49,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUser();
   if ("errorResponse" in result) return result.errorResponse;
+
+  if (await isCommentRateLimited(result.user.id)) return errors.rateLimited("Você atingiu o limite de comentários por hora.");
 
   const { id } = await params;
   const parsed = createCommentSchema.safeParse(await req.json().catch(() => null));

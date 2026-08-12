@@ -58,6 +58,9 @@ export default function FeedScreen() {
         contentContainerStyle={{ padding: 24, gap: theme.space.md }}
         ItemSeparatorComponent={() => <View style={{ height: theme.space.md }} />}
         refreshControl={<RefreshControl refreshing={feed.isRefetching} onRefresh={() => feed.refetch()} />}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={7}
         onEndReachedThreshold={0.4}
         onEndReached={() => {
           if (feed.hasNextPage && !feed.isFetchingNextPage) feed.fetchNextPage();
@@ -65,7 +68,12 @@ export default function FeedScreen() {
         ListHeaderComponent={
           <Stack direction="row" justify="space-between" align="center" style={{ marginBottom: theme.space.md }}>
             <Text variant="title">Feed</Text>
-            <Pressable onPress={() => router.push("/notifications")} hitSlop={8}>
+            <Pressable
+              onPress={() => router.push("/notifications")}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={unreadCount > 0 ? `Notificações, ${unreadCount} não lidas` : "Notificações"}
+            >
               <Stack direction="row" gap="xxs" align="center">
                 <Ionicons name="notifications-outline" size={24} color={theme.colors.text.primary} />
                 {unreadCount > 0 ? (

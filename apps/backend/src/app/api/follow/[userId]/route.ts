@@ -4,10 +4,13 @@ import { resolveFollowStatus } from "@tfit/social";
 import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
 import { isBlockedEitherWay, notifyUser } from "@/lib/social";
+import { isFollowRateLimited } from "@/lib/rateLimit";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
   const result = await requireUser();
   if ("errorResponse" in result) return result.errorResponse;
+
+  if (await isFollowRateLimited(result.user.id)) return errors.rateLimited("Você atingiu o limite de novos seguidos por hora.");
 
   const { userId: targetId } = await params;
   if (targetId === result.user.id) return errors.validation("Você não pode seguir a si mesmo.");

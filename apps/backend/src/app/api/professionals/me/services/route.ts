@@ -4,6 +4,7 @@ import { professionalServiceInputSchema } from "@tfit/validation";
 import type { MyProfessionalServiceItem } from "@tfit/types";
 import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
+import { isServiceCreateRateLimited } from "@/lib/rateLimit";
 
 const MAX_SERVICES = 20;
 
@@ -35,6 +36,8 @@ export async function GET() {
 export async function POST(req: Request) {
   const result = await requireUser();
   if ("errorResponse" in result) return result.errorResponse;
+
+  if (await isServiceCreateRateLimited(result.user.id)) return errors.rateLimited("Você atingiu o limite de itens criados por hora.");
 
   const parsed = professionalServiceInputSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return errors.validation(parsed.error.issues[0]?.message ?? "Dados inválidos.");

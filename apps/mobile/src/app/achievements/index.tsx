@@ -81,6 +81,8 @@ function AchievementDetailModal({ achievement, onClose }: { achievement: Achieve
       <Pressable
         style={{ flex: 1, backgroundColor: theme.colors.overlay, alignItems: "center", justifyContent: "center", padding: 32 }}
         onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar"
       >
         <Surface level="raised" style={{ padding: theme.space.xl, gap: theme.space.md, alignItems: "center", width: "100%" }}>
           <AchievementBadgeIcon achievement={achievement} size={88} />

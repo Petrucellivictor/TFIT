@@ -6,7 +6,7 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 - Mobile stores the session token via the Clerk Expo SDK's built-in secure token cache (`@clerk/expo/token-cache`, backed by `expo-secure-store`) — never `AsyncStorage`.
 - `src/proxy.ts` runs `clerkMiddleware()` on every request only to establish the auth context (so `auth()` is available downstream) — it does **not** decide authorization. Path-matching authorization (`createRouteMatcher` + `auth.protect()` in middleware) is deprecated by Clerk in favor of resource-based checks: every route handler that needs a signed-in user calls `auth()` itself and returns 401 via `errors.unauthorized()` (see `src/lib/http.ts`). This avoids the exact failure mode path-matching has — a route whose matcher pattern silently stops covering it.
-- Rate limiting on AI endpoints: `POST /api/training/generate` is capped at 5/hour/user. Upstash `Ratelimit` is the intended implementation (docs/ARCHITECTURE.md), but the Upstash Marketplace integration is still pending browser terms acceptance (same blocker Neon/Clerk had initially) — `src/lib/rateLimit.ts` implements the same cap via a Postgres count query over `ai_agent_runs` as a real, working interim measure, not a placeholder. Swap the implementation once Upstash is provisioned; call sites won't change.
+- Rate limiting: `POST /api/training/generate` is capped at 5/hour/user (via a Postgres count query over `ai_agent_runs`). Phase 9 extended the same interim pattern to the write endpoints most exposed to spam/abuse — posts (20/hour), comments (60/hour), new follows (100/hour), reports (10/hour — reports are themselves a harassment vector if unbounded), and professional-service creation (20/hour) — each counted directly from that action's own table (`src/lib/rateLimit.ts`), with no separate "rate limit events" bookkeeping table: a burst of *rejected* attempts can't inflate storage, and deleting a row afterward doesn't reset the count. Upstash `Ratelimit` is still the intended long-term implementation (docs/ARCHITECTURE.md) once the Marketplace integration is provisioned; call sites won't change.
 
 ## Data classification
 
@@ -40,7 +40,7 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 ## Audit logging
 
-`audit_logs` records: login (via Clerk webhook), data export, data deletion, privacy setting changes, and admin actions (once `apps/admin` exists). Never logs the content of health data itself — only that an access/change event occurred, by whom, and when.
+`audit_logs` records: login (via Clerk webhook), data export, data deletion, and privacy setting changes. Admin actions (`apps/admin` exists as of Phase 9, but only for the reports queue) aren't wired into `audit_logs` yet — the report-status-update itself has no audit trail beyond the `reports.status` column change. Worth adding once the admin surface grows past a single review queue. Never logs the content of health data itself — only that an access/change event occurred, by whom, and when.
 
 ## AI-specific security
 
@@ -53,7 +53,7 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 - No field or UI claims TFIT has verified a trainer's credentials, identity, or qualifications. The mobile directory and detail screens show an explicit disclaimer to that effect.
 - No payment, booking, or contract flow exists — contact happens outside the app (WhatsApp/phone/Instagram/email via `Linking`), so TFIT is never a party to whatever the user and trainer agree to.
-- Anyone can list themselves; there's no application/approval step. If abuse surfaces (fake listings, harassment via the directory), moderation tooling is a Phase 9 admin-panel concern, same as content moderation generally.
+- Anyone can list themselves; there's no application/approval step. If abuse surfaces (fake listings, harassment via the directory), it's reportable (`targetType: "user"`) into the same admin reports queue as general content moderation (Phase 9, below).
 
 ## Professional service menu (Phase 8)
 
@@ -74,7 +74,26 @@ Sharing a plan looks up the recipient by exact `profiles.handle` and deep-copies
 - Reporting (`POST /api/reports`) writes to a `reports` table for future admin review — there is no automated moderation action yet (no auto-hide, no auto-ban). This is a deliberate scope limit for Phase 6, not an oversight: automated content moderation needs its own design pass (false-positive handling, appeals) before it touches user content.
 - Media upload does not use Vercel Blob's client-upload token protocol, because that protocol's browser-side implementation (`@vercel/blob/client`) depends on `undici`/Node `crypto` shims that Metro (Expo's bundler) doesn't reliably resolve. Instead, the mobile app compresses images client-side and uploads through an authenticated backend route that calls Blob's server-side `put()` — see `docs/API.md`'s Phase 6 section. The upload route still validates MIME type and size server-side, independent of the client-side compression step, per the input-handling rule above.
 
+## Admin panel (Phase 9)
+
+`apps/admin` — despite what earlier drafts of this doc set and docs/ARCHITECTURE.md said, this **did not exist as a stub from Phase 1**; it was built from zero in Phase 9, scoped to exactly one screen: the `reports` review queue (list by status, mark reviewed/dismissed — no content-removal action yet, that's still done directly against the database). Concretely:
+
+- **No RBAC system exists.** Authorization is an explicit server-side email allowlist (`ADMIN_EMAILS` env var, checked in `src/lib/adminAuth.ts` on every page load) against the same Clerk user pool the main app uses — not a placeholder, but also not the org-based roles docs/ARCHITECTURE.md's §7 originally envisioned for "Phase 8." Swap for Clerk organization roles later without changing the call site's shape (`requireAdmin()`).
+- Same Neon database, same Clerk instance as `apps/backend` — `apps/admin` reads/writes directly via `@tfit/database` rather than proxying through the public API, which is a reasonable choice for an internal tool but means both apps' `DATABASE_URL`/Clerk keys must stay in sync if either rotates.
+- **Not yet deployed as a separate Vercel project** — it runs locally (`npm run dev -w @tfit/admin`) and builds cleanly, but the actual production deployment (new Vercel project, custom domain, its own env vars set there) is a manual provisioning step for the account owner, same category as the still-pending Upstash/Apple/Google steps elsewhere in this doc.
+- Deliberately out of scope for Phase 9: user management, broader content moderation (removing a post/comment from the admin UI itself), analytics. The reports queue was prioritized because it was the one genuine safety gap — reports had been collectable since Phase 6 with zero way to ever act on one.
+
+## Dependency vulnerabilities (Phase 9 audit)
+
+`npm audit` reports 45 known vulnerabilities (25 moderate, 20 high, 0 critical) as of Phase 9. Two clusters:
+
+1. **Expo/Metro/React Native toolchain** (dev-time bundler issues, e.g. an `image-size` parser DoS) — real fix needs a major Expo/RN version bump, which is exactly the kind of large, hard-to-reverse change (touches every screen, needs full regression testing) this project doesn't take casually mid-"polish phase."
+2. **A `@solana-mobile`/wallet-adapter dependency chain pulled in transitively via `@clerk/expo`** (Clerk's SDK bundles wallet-adapter code this app never uses) — needs a `@clerk/expo` major bump to fully clear.
+
+The one non-breaking fix available (`npm audit fix` without `--force`) was applied in Phase 9: `@clerk/expo` 4.2.5 → 4.2.7. It didn't move the vulnerability count (the Solana chain needs the major bump above), but it's a real, verified-safe patch update, not a no-op. The remaining 45 are tracked here rather than either ignored or forced through `--force` (which would be a breaking, unreviewed mass-upgrade) — a dedicated dependency-upgrade project, scoped and regression-tested on its own, is the right way to clear them.
+
 ## Open items tracked, not yet due
 
-- Formal threat model / pen-test pass: scheduled for Phase 8 polish, once the full surface (social + professional features) exists.
-- MFA: Clerk supports it natively: enable once account-recovery UX is designed (Phase 8), not required for Phase 1 preview usage.
+- Formal threat model / pen-test pass: still pending — realistic once the admin panel and the rest of the moderation surface are more built out.
+- MFA: Clerk supports it natively; enable once account-recovery UX is designed, not required for current preview usage.
+- The major-version dependency upgrades described above.

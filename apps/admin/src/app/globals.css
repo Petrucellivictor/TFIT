@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f7f5;
+  color: #14151a;
+}
+
+a {
+  color: #0e7c61;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid #cfcfc9;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: #ffffff;
+}
+
+button:hover {
+  background: #eeeeeb;
+}

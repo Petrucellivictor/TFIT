@@ -54,6 +54,8 @@ export function ExercisePickerModal({
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => setMuscle(item.value)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: muscle === item.value }}
                 style={{
                   paddingVertical: theme.space.xxs,
                   paddingHorizontal: theme.space.sm,

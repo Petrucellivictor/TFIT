@@ -26,8 +26,12 @@ Dark mode is a first-class design, not an inverted palette: separate contrast/el
 ## Motion & 3D budget (master spec §28/§32)
 
 - Reanimated for UI-thread microinteractions (set completion, XP gain, streak flame, level-up, like-button burst) — implemented in Phase 7 for the rest timer, XP/FIT Score bars, achievement unlock celebration, and badge entrance animation.
-- `react-native-svg` (+ Reanimated's `useAnimatedProps`) for the one genuinely circular/vector shape needed so far — the rest-timer progress ring — rather than pulling in Skia for a single use case. Skia stays reserved for actual exercise 3D/illustrative demonstrations, which are still deferred (Phase 9, docs/ARCHITECTURE.md) pending real content and an admin upload pipeline; no placeholder 3D work was built to fill the phase number.
+- `react-native-svg` (+ Reanimated's `useAnimatedProps`) for the one genuinely circular/vector shape needed so far — the rest-timer progress ring — rather than pulling in Skia for a single use case. Skia stays reserved for actual exercise 3D/illustrative demonstrations, which remain deferred pending real content and an admin content-upload pipeline (neither exists — Phase 9's admin panel shipped only a reports queue, docs/ARCHITECTURE.md); no placeholder 3D work was built to fill a phase number.
 - Every animated component ships a reduced-motion fallback and is profiled on a low-end Android target before merging (performance budget, not a suggestion). The Phase 7 components (rest-timer ring, progress bars, achievement entrance, celebration modal, like-button burst) all check `theme.reducedMotion` and snap instead of animating when it's on.
+
+## Accessibility (Phase 9)
+
+Every icon-only or ambiguous-purpose `Pressable` app-wide carries `accessibilityRole="button"` and a Portuguese `accessibilityLabel` — modal close buttons, like/comment/menu icons, reorder chevrons, state toggles (labels reflect current state, e.g. "Curtir"/"Descurtir"). `Pressable`s wrapping already-self-descriptive visible text (a `Button` labeled "Salvar", a settings row whose own text names the destination) are deliberately left as-is — mechanically labeling everything would be noise for a screen reader, not help. Minimum touch targets get `hitSlop={8}` where an icon's hit area would otherwise fall under ~44 logical pixels. Not yet audited: color contrast ratios against WCAG AA (the token palette was designed by eye, not measured) and screen-reader flow-order testing on a real device — both worth a dedicated pass, not folded into this one.
 
 ## Screen state contract
 
@@ -35,7 +39,7 @@ Every screen must define, before implementation (master spec §57): loading, suc
 
 ## Navigation shape (master spec §49)
 
-Bottom tab bar: `Home`, `Treinos`, `Personal`, `Feed`, `Perfil`, plus a floating `+` action button overlaid on the bar (start workout / check-in / post) rather than consuming a tab slot. `Personal` (the trainer directory, Phase 5) was added to the original 4-tab plan at the user's request — 5 tabs plus an overlaid FAB is still within normal mobile bottom-nav bounds. Revisit if Phase 6 social features want more room.
+Bottom tab bar: `Home`, `Treinos`, `Personal`, `Feed`, `Perfil`, plus a floating `+` action button overlaid on the bar (start workout / check-in / post) rather than consuming a tab slot. `Personal` (the trainer directory, Phase 5) was added to the original 4-tab plan at the user's request; `Feed` (Phase 6, social) fit into the existing 5th slot without needing a 6th tab. 5 tabs plus an overlaid FAB is still within normal mobile bottom-nav bounds.
 
 ## Component philosophy
 

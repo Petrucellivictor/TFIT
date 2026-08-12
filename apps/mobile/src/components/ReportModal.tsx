@@ -33,7 +33,12 @@ export function ReportModal({ visible, onClose, targetType, targetId, onSubmit, 
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <Pressable style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }} onPress={handleClose}>
+      <Pressable
+        style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }}
+        onPress={handleClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar"
+      >
         <Pressable onPress={(e) => e.stopPropagation()}>
           <Surface
             level="raised"

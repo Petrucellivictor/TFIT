@@ -31,6 +31,8 @@ export function QuickActionSheet({ visible, onClose }: { visible: boolean; onClo
       <Pressable
         style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }}
         onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar"
       >
         <Surface
           level="raised"

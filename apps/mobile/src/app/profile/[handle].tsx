@@ -89,7 +89,12 @@ export default function ProfileScreen() {
                 </Stack>
               </Stack>
               {!isSelf ? (
-                <Pressable onPress={() => setMenuOpen(true)} hitSlop={8}>
+                <Pressable
+                  onPress={() => setMenuOpen(true)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir menu do perfil"
+                >
                   <Ionicons name="ellipsis-horizontal" size={22} color={theme.colors.text.secondary} />
                 </Pressable>
               ) : null}
@@ -149,6 +154,8 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() => router.push({ pathname: "/post/[id]", params: { id: item.id } })}
               style={{ flex: 1 / 3, aspectRatio: 1 }}
+              accessibilityRole="button"
+              accessibilityLabel="Abrir post"
             >
               {thumb ? (
                 <Image source={{ uri: thumb }} style={{ flex: 1, backgroundColor: theme.colors.background.sunken }} contentFit="cover" />

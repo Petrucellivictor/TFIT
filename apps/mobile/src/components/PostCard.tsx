@@ -32,7 +32,12 @@ function LikeButton({ liked, count, onToggle }: { liked: boolean; count: number;
   /* eslint-enable react-hooks/immutability */
 
   return (
-    <Pressable onPress={handlePress} hitSlop={8}>
+    <Pressable
+      onPress={handlePress}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={liked ? "Descurtir" : "Curtir"}
+    >
       <Stack direction="row" gap="xxs" align="center">
         <Animated.View style={animatedStyle}>
           <Ionicons
@@ -70,7 +75,12 @@ export function PostCard({
     <Surface level="raised" style={{ overflow: "hidden" }}>
       <Stack gap="sm" style={{ padding: theme.space.md }}>
         <Stack direction="row" align="center" justify="space-between">
-          <Pressable onPress={onPressAuthor} style={{ flex: 1 }}>
+          <Pressable
+            onPress={onPressAuthor}
+            style={{ flex: 1 }}
+            accessibilityRole="button"
+            accessibilityLabel={`Abrir perfil de ${post.author.displayName}`}
+          >
             <Stack direction="row" gap="sm" align="center">
               <Avatar uri={post.author.avatarUrl} name={post.author.displayName} size={40} />
               <Stack gap="xxs" style={{ flex: 1 }}>
@@ -81,7 +91,12 @@ export function PostCard({
               </Stack>
             </Stack>
           </Pressable>
-          <Pressable onPress={onOpenMenu} hitSlop={8}>
+          <Pressable
+            onPress={onOpenMenu}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir menu do post"
+          >
             <Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.text.secondary} />
           </Pressable>
         </Stack>
@@ -99,7 +114,7 @@ export function PostCard({
       </Stack>
 
       {heroMediaUrl ? (
-        <Pressable onPress={onPress}>
+        <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Abrir post">
           <Image
             source={{ uri: heroMediaUrl }}
             style={{ width: "100%", aspectRatio: 1, backgroundColor: theme.colors.background.sunken }}
@@ -110,7 +125,7 @@ export function PostCard({
 
       <Stack direction="row" gap="lg" align="center" style={{ padding: theme.space.md }}>
         <LikeButton liked={post.likedByViewer} count={post.likeCount} onToggle={onToggleLike} />
-        <Pressable onPress={onPress} hitSlop={8}>
+        <Pressable onPress={onPress} hitSlop={8} accessibilityRole="button" accessibilityLabel="Comentar">
           <Stack direction="row" gap="xxs" align="center">
             <Ionicons name="chatbubble-outline" size={20} color={theme.colors.text.secondary} />
             <Text variant="caption" color="secondary">

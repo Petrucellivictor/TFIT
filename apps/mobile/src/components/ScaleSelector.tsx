@@ -26,6 +26,7 @@ export function ScaleSelector({
               key={n}
               onPress={() => onChange(n)}
               accessibilityRole="button"
+              accessibilityLabel={`${label}, nível ${n} de 5`}
               accessibilityState={{ selected }}
               style={{
                 flex: 1,

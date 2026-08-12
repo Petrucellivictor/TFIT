@@ -24,6 +24,8 @@ export function PostActionSheet({ visible, onClose, isOwnPost, onDelete, onRepor
       <Pressable
         style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }}
         onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar"
       >
         <Surface
           level="raised"
