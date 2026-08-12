@@ -1,7 +1,8 @@
 import { useAuth } from "@clerk/expo";
 import { useMutation } from "@tanstack/react-query";
-import type { LogSetInput, WorkoutDetail, WorkoutSession } from "@tfit/types";
+import type { GamificationEventResult, LogSetInput, WorkoutDetail, WorkoutSession } from "@tfit/types";
 import { apiFetch } from "@/lib/api";
+import { useInvalidateGamification } from "./useGamification";
 
 export function useStartSession() {
   const { getToken } = useAuth();
@@ -19,27 +20,36 @@ export function useStartSession() {
 
 export function useLogSet(sessionId: string) {
   const { getToken } = useAuth();
+  const invalidateGamification = useInvalidateGamification();
 
   return useMutation({
     mutationFn: async (input: LogSetInput) => {
       const token = await getToken();
-      return apiFetch<{ isNewPersonalRecord: boolean }>(`/api/workouts/sessions/${sessionId}/sets`, token, {
-        method: "POST",
-        body: JSON.stringify(input),
-      });
+      return apiFetch<{ isNewPersonalRecord: boolean; gamification: GamificationEventResult }>(
+        `/api/workouts/sessions/${sessionId}/sets`,
+        token,
+        { method: "POST", body: JSON.stringify(input) },
+      );
+    },
+    onSuccess: (data) => {
+      if (data.gamification.xpAwarded > 0) invalidateGamification();
     },
   });
 }
 
 export function useCompleteSession(sessionId: string) {
   const { getToken } = useAuth();
+  const invalidateGamification = useInvalidateGamification();
 
   return useMutation({
     mutationFn: async () => {
       const token = await getToken();
-      return apiFetch<{ session: WorkoutSession }>(`/api/workouts/sessions/${sessionId}/complete`, token, {
-        method: "POST",
-      });
+      return apiFetch<{ session: WorkoutSession; gamification: GamificationEventResult }>(
+        `/api/workouts/sessions/${sessionId}/complete`,
+        token,
+        { method: "POST" },
+      );
     },
+    onSuccess: invalidateGamification,
   });
 }

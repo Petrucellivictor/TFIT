@@ -28,7 +28,7 @@ No agent's raw output is ever written directly to `workout_plans`/`workouts`. Th
 | 08 | **Recovery Agent** | Check-ins, RPE, frequency | Recovery-driven training adjustment | |
 | 09 | **Workout Reviewer** | Fully composed workout | `APPROVED` / `REJECTED` + justification/corrections | Last check before the user sees the plan. |
 | 10 | **Social Agent** | User's social graph + activity | Feed/discovery/challenge relevance signals | Must not manipulate engagement abusively (master spec §26/§52). |
-| 11 | **Gamification Agent** | XP/streak/challenge state | XP awards, level/streak updates, challenge suggestions | Must not incentivize overtraining. |
+| 11 | **Gamification Agent** | XP/streak/challenge state | XP awards, level/streak updates, challenge progress | **Implemented in Phase 4 as deterministic code (`packages/gamification`), not an LLM call** — XP amounts, level thresholds, and streak/freeze rules are fixed business rules, not judgment calls; a model call here would add cost/latency/non-determinism with zero benefit (same reasoning as the Orchestrator). Must not incentivize overtraining — streak freezes are earned by consistency, not volume. |
 | 12 | **Motivation Agent** | Progress vs. goals | Contextual, non-repetitive motivational copy | |
 | 13 | **Content Moderation Agent** | Post/comment content | Spam/abuse/nudity/harassment flags | Feeds the human report/review queue; never auto-bans without a review path. |
 | 14 | **QA Agent** | App flows/APIs | Bug/edge-case reports | Used in CI and pre-release, not at runtime for end users. |

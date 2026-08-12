@@ -10,6 +10,7 @@ import {
   personalRecords,
 } from "@tfit/database";
 import { ACCOUNT_PROVISIONING_MESSAGE, errors, jsonOk } from "@/lib/http";
+import { awardXp, checkAndUnlockAchievements } from "@/lib/gamification";
 
 const logSetSchema = z.object({
   workoutExerciseId: z.string().uuid(),
@@ -57,6 +58,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     .returning();
 
   let isNewPersonalRecord = false;
+  let xpAwarded = 0;
+  let newAchievements: Awaited<ReturnType<typeof checkAndUnlockAchievements>> = [];
+
   if (parsed.data.weightKg !== undefined) {
     const bestRecord = await db.query.personalRecords.findFirst({
       where: and(eq(personalRecords.userId, user.id), eq(personalRecords.exerciseId, workoutExercise.exerciseId)),
@@ -69,15 +73,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       (parsed.data.weightKg === bestWeight && parsed.data.repsCompleted > (bestRecord?.reps ?? 0));
 
     if (isBetter && parsed.data.weightKg > 0) {
-      await db.insert(personalRecords).values({
-        userId: user.id,
-        exerciseId: workoutExercise.exerciseId,
-        weightKg: parsed.data.weightKg.toString(),
-        reps: parsed.data.repsCompleted,
-      });
+      const [newRecord] = await db
+        .insert(personalRecords)
+        .values({
+          userId: user.id,
+          exerciseId: workoutExercise.exerciseId,
+          weightKg: parsed.data.weightKg.toString(),
+          reps: parsed.data.repsCompleted,
+        })
+        .returning();
       isNewPersonalRecord = true;
+      xpAwarded = await awardXp(user.id, "personal_record", newRecord!.id);
+      newAchievements = await checkAndUnlockAchievements(user.id);
     }
   }
 
-  return jsonOk({ set, isNewPersonalRecord }, 201);
+  return jsonOk({ set, isNewPersonalRecord, gamification: { xpAwarded, newAchievements } }, 201);
 }

@@ -3,6 +3,7 @@ import { getDb, smartGoals } from "@tfit/database";
 import { updateGoalInputSchema } from "@tfit/validation";
 import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
+import { awardXp } from "@/lib/gamification";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUser();
@@ -27,5 +28,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     .where(eq(smartGoals.id, id))
     .returning();
 
-  return jsonOk({ goal });
+  let xpAwarded = 0;
+  if (parsed.data.status === "achieved" && existing.status !== "achieved") {
+    xpAwarded = await awardXp(result.user.id, "goal_achieved", id);
+  }
+
+  return jsonOk({ goal, gamification: { xpAwarded } });
 }

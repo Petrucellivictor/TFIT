@@ -58,3 +58,14 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 | `GET`/`POST` | `/api/goals` | List / create a user-defined goal. |
 | `PATCH` | `/api/goals/:id` | Update a goal's status (`active`/`achieved`/`abandoned`). |
 | `GET` | `/api/progress` | Aggregate for the evolution dashboard: FIT Score, weight trend, recent PRs, active goals, check-in streak. |
+
+## Phase 4 endpoints (implemented)
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/gamification/profile` | XP total, level progress, and streak (current/longest/freezes available). |
+| `GET` | `/api/achievements` | Full badge catalog with each one's unlock date (`null` if locked). |
+| `GET` | `/api/challenges` | Public challenges active for the current period, with the caller's participation/progress if joined. |
+| `POST` | `/api/challenges/:id/join` | Join a challenge (idempotent — returns the existing participation if already joined). |
+
+XP/streak/achievement side effects are attached to the actions that earn them rather than requiring a separate call: completing a workout session, submitting a check-in, logging a new personal record, and marking a goal achieved all return a `gamification` field in their response (`xpAwarded`, `streakEvent`, `newAchievements`, ...). See `src/lib/gamification.ts`.

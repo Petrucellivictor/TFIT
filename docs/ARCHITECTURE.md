@@ -69,6 +69,7 @@ infrastructure/   IaC / environment notes (mostly Vercel + Marketplace config as
 1. **Foundation** ✅: architecture, design system, auth, foundation DB schema, navigation shell, onboarding UI.
 2. **Fitness core** ✅ (code complete; live end-to-end test pending a credit card on the Vercel account for the AI Gateway — see §6): assessment, exercise library, deterministic workout engine, the 7 generation-pipeline agents wired for real, workout mode. The remaining 8 agents (recovery, social, gamification, motivation, moderation, QA, code-review) stay as design contracts until their phases.
 3. **Evolution** ✅: check-ins, body measurements, user-defined goals, and the FIT Score, backed by an evolution dashboard. Progression history is a query over Phase 2 data rather than a new table (docs/DATABASE.md).
+4. **Gamification** ✅: XP (deterministic, not an LLM call — see docs/AGENTS.md's revised Gamification Agent note), levels, streaks with a freeze/recovery mechanic, achievements, and system-created public challenges. Friend-vs-friend challenges wait for the Phase 5 social graph.
 4. **Gamification**: XP, levels, streaks, achievements, challenges.
 5. **Social**: profiles, feed, posts, friends, followers, comments.
 6. **3D/Motion**: exercise 3D demonstrations, badges, microinteractions.

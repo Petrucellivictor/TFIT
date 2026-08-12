@@ -3,8 +3,10 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
+import { ScoreBar } from "@/components/ScoreBar";
 import { useMe } from "@/hooks/useMe";
 import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
+import { useGamificationProfile } from "@/hooks/useGamification";
 
 function greeting() {
   const hour = new Date().getHours();
@@ -17,6 +19,37 @@ function greeting() {
 function isoDayOfWeek(date: Date): number {
   const jsDay = date.getDay();
   return jsDay === 0 ? 7 : jsDay;
+}
+
+function GamificationSummary() {
+  const theme = useTheme();
+  const router = useRouter();
+  const gamification = useGamificationProfile();
+
+  if (!gamification.data) return null;
+  const { name, level, xpIntoLevel, xpForNextLevel, isMaxLevel, streak } = gamification.data;
+  const progressPercent = isMaxLevel || !xpForNextLevel ? 100 : Math.round((xpIntoLevel / xpForNextLevel) * 100);
+
+  return (
+    <Pressable onPress={() => router.push("/achievements")}>
+      <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.sm }}>
+        <Stack direction="row" justify="space-between" align="center">
+          <Stack direction="row" gap="xs" align="center">
+            <Text variant="bodyStrong">
+              Nível {level} — {name}
+            </Text>
+          </Stack>
+          {streak.current > 0 ? (
+            <Stack direction="row" gap="xxs" align="center">
+              <Text>🔥</Text>
+              <Text variant="bodyStrong">{streak.current}</Text>
+            </Stack>
+          ) : null}
+        </Stack>
+        {!isMaxLevel ? <ScoreBar label={`${xpIntoLevel} / ${xpForNextLevel} XP`} value={progressPercent} /> : null}
+      </Surface>
+    </Pressable>
+  );
 }
 
 export default function HomeScreen() {
@@ -39,6 +72,8 @@ export default function HomeScreen() {
             {greeting()}, {me.data?.profile.displayName.split(" ")[0]}
           </Text>
         )}
+
+        <GamificationSummary />
 
         {!plan.data?.plan ? (
           <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm, alignItems: "center" }}>

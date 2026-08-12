@@ -3,6 +3,7 @@ import { getDb, dailyCheckins } from "@tfit/database";
 import { checkinInputSchema } from "@tfit/validation";
 import { errors, jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
+import { awardXp, checkAndUnlockAchievements, recordStreakActivity, updateChallengeProgress } from "@/lib/gamification";
 
 export async function GET() {
   const result = await requireUser();
@@ -38,5 +39,18 @@ export async function POST(req: Request) {
     })
     .returning();
 
-  return jsonOk({ checkin }, 201);
+  const [xpAwarded, streakResult] = await Promise.all([
+    awardXp(result.user.id, "checkin", checkin!.id),
+    recordStreakActivity(result.user.id),
+  ]);
+  await updateChallengeProgress(result.user.id, "streak_days", { kind: "set", value: streakResult.currentStreak });
+  const newAchievements = await checkAndUnlockAchievements(result.user.id);
+
+  return jsonOk(
+    {
+      checkin,
+      gamification: { xpAwarded, streakEvent: streakResult.event, currentStreak: streakResult.currentStreak, newAchievements },
+    },
+    201,
+  );
 }

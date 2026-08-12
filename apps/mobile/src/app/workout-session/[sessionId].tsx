@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
-import type { SetFeedback, WorkoutDetail } from "@tfit/types";
+import type { GamificationEventResult, SetFeedback, WorkoutDetail } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { Chip } from "@/components/Chip";
 import { RestTimer } from "@/components/RestTimer";
@@ -41,6 +41,22 @@ function buildTasks(workout: WorkoutDetail): SetTask[] {
   );
 }
 
+function GamificationResultCard({ result }: { result: GamificationEventResult }) {
+  const theme = useTheme();
+  if (result.xpAwarded === 0 && result.newAchievements.length === 0) return null;
+
+  return (
+    <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.xs, backgroundColor: theme.colors.accent.primaryMuted }}>
+      {result.xpAwarded > 0 ? <Text variant="bodyStrong">+{result.xpAwarded} XP</Text> : null}
+      {result.newAchievements.map((achievement) => (
+        <Text key={achievement.id} color="secondary">
+          🏆 Nova conquista: {achievement.name}
+        </Text>
+      ))}
+    </Surface>
+  );
+}
+
 export default function WorkoutSessionScreen() {
   const { sessionId, workout: workoutParam } = useLocalSearchParams<{ sessionId: string; workout: string }>();
   const workout = useMemo(() => JSON.parse(workoutParam) as WorkoutDetail, [workoutParam]);
@@ -52,14 +68,33 @@ export default function WorkoutSessionScreen() {
   const completeSession = useCompleteSession(sessionId);
 
   const [taskIndex, setTaskIndex] = useState(0);
-  const [phase, setPhase] = useState<"logging" | "resting" | "summary">("logging");
+  const [phase, setPhase] = useState<"logging" | "resting" | "summary" | "completed">("logging");
   const [reps, setReps] = useState(String(tasks[0]?.repsMax ?? ""));
   const [weight, setWeight] = useState("");
   const [feedback, setFeedback] = useState<SetFeedback | null>(null);
-  const [prBanner, setPrBanner] = useState(false);
+  const [setBanner, setSetBanner] = useState<GamificationEventResult | null>(null);
+  const [completionResult, setCompletionResult] = useState<GamificationEventResult | null>(null);
 
   const task = tasks[taskIndex];
   const isLastTask = taskIndex === tasks.length - 1;
+
+  if (phase === "completed") {
+    return (
+      <Screen>
+        <Stack align="center" justify="center" gap="lg" style={{ flex: 1, padding: 32 }}>
+          <Ionicons name="checkmark-circle" size={56} color={theme.colors.accent.primary} />
+          <Text variant="title" style={{ textAlign: "center" }}>
+            Treino concluído!
+          </Text>
+          <Text color="secondary" style={{ textAlign: "center" }}>
+            Você completou {tasks.length} séries em {workout.name}.
+          </Text>
+          {completionResult ? <GamificationResultCard result={completionResult} /> : null}
+          <Button label="Voltar" onPress={() => router.replace("/(app)/treinos")} />
+        </Stack>
+      </Screen>
+    );
+  }
 
   if (phase === "summary" || !task) {
     return (
@@ -76,7 +111,10 @@ export default function WorkoutSessionScreen() {
             label={completeSession.isPending ? "Salvando..." : "Concluir"}
             onPress={() =>
               completeSession.mutate(undefined, {
-                onSuccess: () => router.replace("/(app)/treinos"),
+                onSuccess: (res) => {
+                  setCompletionResult(res.gamification);
+                  setPhase("completed");
+                },
               })
             }
             disabled={completeSession.isPending}
@@ -118,9 +156,9 @@ export default function WorkoutSessionScreen() {
       },
       {
         onSuccess: (res) => {
-          if (res.isNewPersonalRecord) {
-            setPrBanner(true);
-            setTimeout(() => setPrBanner(false), 2500);
+          if (res.isNewPersonalRecord || res.gamification.xpAwarded > 0 || res.gamification.newAchievements.length > 0) {
+            setSetBanner(res.gamification);
+            setTimeout(() => setSetBanner(null), 3000);
           }
           if (isLastTask) {
             setPhase("summary");
@@ -145,11 +183,16 @@ export default function WorkoutSessionScreen() {
           </Text>
         </Stack>
 
-        {prBanner ? (
+        {setBanner ? (
           <Surface level="raised" style={{ padding: theme.space.sm, backgroundColor: theme.colors.accent.primaryMuted }}>
             <Text variant="bodyStrong" style={{ textAlign: "center" }}>
-              🏆 Novo recorde pessoal!
+              🏆 Novo recorde pessoal!{setBanner.xpAwarded > 0 ? ` +${setBanner.xpAwarded} XP` : ""}
             </Text>
+            {setBanner.newAchievements.map((achievement) => (
+              <Text key={achievement.id} color="secondary" style={{ textAlign: "center" }}>
+                Conquista desbloqueada: {achievement.name}
+              </Text>
+            ))}
           </Surface>
         ) : null}
 

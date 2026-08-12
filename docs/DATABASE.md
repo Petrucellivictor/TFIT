@@ -44,9 +44,18 @@ Conventions:
 
 The master spec's `progression_history` isn't a physical table: strength progression over time is a query over the Phase 2 `exercise_sets`/`personal_records` tables that already hold the raw facts (`GET /api/progress` computes it) — storing it again separately would just be a sync hazard.
 
-## Phase 4 — Gamification
+## Phase 4 (implemented now) — Gamification
 
-`xp_transactions`, `levels`, `streaks`, `achievements`, `user_achievements`, `challenges`, `challenge_participants`.
+| Table | Purpose |
+|---|---|
+| `xp_transactions` | Append-only ledger of every XP grant (amount, reason, and the row that earned it via `reference_id`). A user's total XP is `sum(amount)` over this table, not a cached counter — always re-derivable, always auditable for anti-abuse review (master spec §52). A unique constraint on `(user_id, reason, reference_id)` makes double-granting XP for the same event (e.g. completing the same workout session twice) structurally impossible rather than relying on application code to remember to check. |
+| `streaks` | One row per user: current/longest streak, last activity date, and freeze count — persisted because freeze mechanics are stateful (a freeze is a resource that gets spent), unlike the Phase 3 check-in streak which was a pure derived count. |
+| `achievements` | Badge catalog (slug, name, description, icon, unlock criteria) — content data like `exercise_library`, seeded the same way. |
+| `user_achievements` | Which achievements a user has unlocked, and when. |
+| `challenges` | Challenge definitions (title, type, target, period). Phase 4 only ships system-created public challenges anyone can join solo — friend-vs-friend challenges need the Phase 5 social graph and are deferred there. |
+| `challenge_participants` | A user's progress/status within a challenge they've joined. |
+
+The master spec's `levels` isn't a table: level names and XP thresholds are static app content (like the FIT Score formula), so they live as a constant in `packages/gamification` rather than rows that would never actually change per-deployment without a code change anyway.
 
 ## Phase 5 — Social
 

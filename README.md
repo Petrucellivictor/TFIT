@@ -42,4 +42,4 @@ Each app also has its own `.env.local`, pulled from Vercel:
 cd apps/backend && vercel env pull --yes
 ```
 
-See `docs/DEPLOYMENT.md` for the full environment/provisioning story and `docs/ARCHITECTURE.md` §5 for the phase-by-phase build roadmap. **Phases 1-3** (Foundation, Fitness core, Evolution) are built; Neon, Clerk, and the exercise library are live. The AI Gateway calls are implemented and unit-tested but not yet exercised end-to-end — the Vercel account needs a credit card on file before the Gateway will serve requests (see `docs/SECURITY.md`).
+See `docs/DEPLOYMENT.md` for the full environment/provisioning story and `docs/ARCHITECTURE.md` §5 for the phase-by-phase build roadmap. **Phases 1-4** (Foundation, Fitness core, Evolution, Gamification) are built; Neon, Clerk, and the exercise library are live. The AI Gateway calls are implemented and unit-tested but not yet exercised end-to-end — the Vercel account needs a credit card on file before the Gateway will serve requests (see `docs/SECURITY.md`).

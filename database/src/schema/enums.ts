@@ -65,3 +65,26 @@ export const goalTypeEnum = pgEnum("goal_type", [
 ]);
 
 export const goalStatusEnum = pgEnum("goal_status", ["active", "achieved", "abandoned"]);
+
+export const xpReasonEnum = pgEnum("xp_reason", [
+  "workout_completed",
+  "checkin",
+  "personal_record",
+  "goal_achieved",
+  "challenge_completed",
+]);
+
+export const challengeTypeEnum = pgEnum("challenge_type", [
+  "workouts_count",
+  "cardio_minutes",
+  "streak_days",
+  "custom",
+]);
+
+export const challengePeriodEnum = pgEnum("challenge_period", ["weekly", "monthly", "fixed"]);
+
+export const challengeParticipantStatusEnum = pgEnum("challenge_participant_status", [
+  "active",
+  "completed",
+  "failed",
+]);

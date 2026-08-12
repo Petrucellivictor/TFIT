@@ -14,3 +14,7 @@ export * from "./aiAgentRuns";
 export * from "./dailyCheckins";
 export * from "./measurements";
 export * from "./smartGoals";
+export * from "./xpTransactions";
+export * from "./streaks";
+export * from "./achievements";
+export * from "./challenges";

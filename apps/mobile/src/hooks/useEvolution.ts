@@ -1,7 +1,16 @@
 import { useAuth } from "@clerk/expo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { CheckinInput, CreateGoalInput, Goal, GoalStatus, MeasurementInput, ProgressResponse } from "@tfit/types";
+import type {
+  CheckinInput,
+  CreateGoalInput,
+  GamificationEventResult,
+  Goal,
+  GoalStatus,
+  MeasurementInput,
+  ProgressResponse,
+} from "@tfit/types";
 import { apiFetch } from "@/lib/api";
+import { useInvalidateGamification } from "./useGamification";
 
 export function useProgress() {
   const { getToken, isSignedIn } = useAuth();
@@ -19,13 +28,20 @@ export function useProgress() {
 export function useSubmitCheckin() {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
+  const invalidateGamification = useInvalidateGamification();
 
   return useMutation({
     mutationFn: async (input: CheckinInput) => {
       const token = await getToken();
-      return apiFetch("/api/checkins", token, { method: "POST", body: JSON.stringify(input) });
+      return apiFetch<{ gamification: GamificationEventResult }>("/api/checkins", token, {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["progress"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["progress"] });
+      invalidateGamification();
+    },
   });
 }
 
@@ -71,15 +87,19 @@ export function useCreateGoal() {
 export function useUpdateGoal() {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
+  const invalidateGamification = useInvalidateGamification();
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: GoalStatus }) => {
       const token = await getToken();
-      return apiFetch<{ goal: Goal }>(`/api/goals/${id}`, token, {
+      return apiFetch<{ goal: Goal; gamification: { xpAwarded: number } }>(`/api/goals/${id}`, token, {
         method: "PATCH",
         body: JSON.stringify({ status }),
       });
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["progress"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["progress"] });
+      invalidateGamification();
+    },
   });
 }

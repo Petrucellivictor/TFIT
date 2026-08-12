@@ -6,6 +6,32 @@ import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useMe } from "@/hooks/useMe";
 
+function ProfileLinkRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Pressable onPress={onPress}>
+      <Surface level="raised" style={{ padding: theme.space.md }}>
+        <Stack direction="row" justify="space-between" align="center">
+          <Stack direction="row" gap="sm" align="center">
+            <Ionicons name={icon} size={20} color={theme.colors.accent.primary} />
+            <Text variant="bodyStrong">{label}</Text>
+          </Stack>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.text.secondary} />
+        </Stack>
+      </Surface>
+    </Pressable>
+  );
+}
+
 export default function PerfilScreen() {
   const theme = useTheme();
   const router = useRouter();
@@ -45,17 +71,11 @@ export default function PerfilScreen() {
           </Stack>
         )}
 
-        <Pressable onPress={() => router.push("/evolution")}>
-          <Surface level="raised" style={{ padding: theme.space.md }}>
-            <Stack direction="row" justify="space-between" align="center">
-              <Stack direction="row" gap="sm" align="center">
-                <Ionicons name="trending-up-outline" size={20} color={theme.colors.accent.primary} />
-                <Text variant="bodyStrong">Ver evolução</Text>
-              </Stack>
-              <Ionicons name="chevron-forward" size={18} color={theme.colors.text.secondary} />
-            </Stack>
-          </Surface>
-        </Pressable>
+        <Stack gap="sm">
+          <ProfileLinkRow icon="trending-up-outline" label="Ver evolução" onPress={() => router.push("/evolution")} />
+          <ProfileLinkRow icon="trophy-outline" label="Conquistas" onPress={() => router.push("/achievements")} />
+          <ProfileLinkRow icon="flag-outline" label="Desafios" onPress={() => router.push("/challenges")} />
+        </Stack>
 
         <Stack style={{ flex: 1 }} />
 

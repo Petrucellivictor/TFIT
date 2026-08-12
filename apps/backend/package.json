@@ -14,6 +14,7 @@
     "@tfit/ai": "*",
     "@tfit/database": "*",
     "@tfit/fitness-engine": "*",
+    "@tfit/gamification": "*",
     "@tfit/types": "*",
     "@tfit/validation": "*",
     "drizzle-orm": "^0.45.2",
