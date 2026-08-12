@@ -59,6 +59,13 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 Sharing a plan looks up the recipient by exact `profiles.handle` and deep-copies the plan into their library server-side — it does not read anything back from the recipient (no privacy leak: a private profile can still receive a shared plan, since the sender only needs to know the handle, not view the profile). The copy lands `archived`, so it's inert until the recipient chooses to activate it — nothing about a user's active training plan changes without their action.
 
+## Social visibility & moderation (Phase 6)
+
+- Post visibility (`public`/`followers`/`friends`/`private`) is enforced by a single pure function, `canViewPost` (`packages/social`), called identically on every read path — feed, a user's post list, and single-post fetch — so there is exactly one place visibility logic can be wrong, not one per endpoint. Blocking always wins over visibility: a blocked relationship hides content regardless of the post's own setting.
+- Blocking is bidirectional and severs the follow graph: blocking someone deletes any existing follow row in either direction (in the same transaction as the block), and a blocked user cannot re-follow or be discovered via the blocker's followers/following lists.
+- Reporting (`POST /api/reports`) writes to a `reports` table for future admin review — there is no automated moderation action yet (no auto-hide, no auto-ban). This is a deliberate scope limit for Phase 6, not an oversight: automated content moderation needs its own design pass (false-positive handling, appeals) before it touches user content.
+- Media upload does not use Vercel Blob's client-upload token protocol, because that protocol's browser-side implementation (`@vercel/blob/client`) depends on `undici`/Node `crypto` shims that Metro (Expo's bundler) doesn't reliably resolve. Instead, the mobile app compresses images client-side and uploads through an authenticated backend route that calls Blob's server-side `put()` — see `docs/API.md`'s Phase 6 section. The upload route still validates MIME type and size server-side, independent of the client-side compression step, per the input-handling rule above.
+
 ## Open items tracked, not yet due
 
 - Formal threat model / pen-test pass: scheduled for Phase 8 polish, once the full surface (social + professional features) exists.

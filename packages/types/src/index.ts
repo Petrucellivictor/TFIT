@@ -5,3 +5,4 @@ export * from "./workout";
 export * from "./evolution";
 export * from "./gamification";
 export * from "./professionals";
+export * from "./social";

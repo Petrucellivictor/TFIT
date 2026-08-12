@@ -14,7 +14,7 @@ interface QuickAction {
 const ACTIONS: QuickAction[] = [
   { icon: "barbell-outline", label: "Iniciar treino", route: "/(app)/treinos" },
   { icon: "checkmark-circle-outline", label: "Check-in do dia", route: "/checkin" },
-  { icon: "camera-outline", label: "Postar", availableFrom: "Fase 5" },
+  { icon: "camera-outline", label: "Postar", route: "/post/create" },
 ];
 
 export function QuickActionSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {

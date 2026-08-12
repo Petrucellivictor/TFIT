@@ -75,6 +75,26 @@ export default function PerfilScreen() {
           <ProfileLinkRow icon="trending-up-outline" label="Ver evolução" onPress={() => router.push("/evolution")} />
           <ProfileLinkRow icon="trophy-outline" label="Conquistas" onPress={() => router.push("/achievements")} />
           <ProfileLinkRow icon="flag-outline" label="Desafios" onPress={() => router.push("/challenges")} />
+          <ProfileLinkRow icon="notifications-outline" label="Notificações" onPress={() => router.push("/notifications")} />
+          <ProfileLinkRow
+            icon="person-add-outline"
+            label="Solicitações de seguidor"
+            onPress={() => router.push("/follow-requests")}
+          />
+          <ProfileLinkRow
+            icon="person-remove-outline"
+            label="Usuários bloqueados"
+            onPress={() => router.push("/blocked-users")}
+          />
+          {me.data?.profile.handle ? (
+            <ProfileLinkRow
+              icon="grid-outline"
+              label="Ver meu perfil público"
+              onPress={() =>
+                router.push({ pathname: "/profile/[handle]", params: { handle: me.data!.profile.handle } })
+              }
+            />
+          ) : null}
         </Stack>
 
         <Stack style={{ flex: 1 }} />

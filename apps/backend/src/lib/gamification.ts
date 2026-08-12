@@ -20,6 +20,7 @@ import {
   type StreakState,
   type StreakEvent,
 } from "@tfit/gamification";
+import { notifyUser } from "./social";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -166,14 +167,21 @@ export async function checkAndUnlockAchievements(userId: string): Promise<Achiev
     const alreadyUnlocked = new Set(unlockedRows.map((r) => r.achievementId));
     const newlyUnlockedIds = findNewlyUnlockedAchievements(stats, catalog, alreadyUnlocked);
 
+    const byId = new Map(catalog.map((a) => [a.id, a]));
+
     if (newlyUnlockedIds.length > 0) {
       await db
         .insert(userAchievements)
         .values(newlyUnlockedIds.map((achievementId) => ({ userId, achievementId })))
         .onConflictDoNothing({ target: [userAchievements.userId, userAchievements.achievementId] });
+
+      await Promise.all(
+        newlyUnlockedIds.map((id) =>
+          notifyUser(userId, "achievement_unlocked", { referenceId: id, message: byId.get(id)?.name }),
+        ),
+      );
     }
 
-    const byId = new Map(catalog.map((a) => [a.id, a]));
     return newlyUnlockedIds.map((id) => byId.get(id)!).filter(Boolean);
   } catch (error) {
     console.error("checkAndUnlockAchievements failed", { userId, error });

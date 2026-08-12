@@ -95,3 +95,28 @@ export const workoutPlanSourceEnum = pgEnum("workout_plan_source", [
   "copied",
   "shared",
 ]);
+
+export const followerStatusEnum = pgEnum("follower_status", ["pending", "accepted"]);
+
+export const postTypeEnum = pgEnum("post_type", [
+  "photo",
+  "workout",
+  "achievement",
+  "personal_record",
+  "streak",
+  "text",
+]);
+
+export const postVisibilityEnum = pgEnum("post_visibility", ["public", "followers", "friends", "private"]);
+
+export const notificationTypeEnum = pgEnum("notification_type", [
+  "new_follower",
+  "follow_request",
+  "comment",
+  "like",
+  "achievement_unlocked",
+]);
+
+export const reportTargetTypeEnum = pgEnum("report_target_type", ["post", "comment", "user"]);
+
+export const reportStatusEnum = pgEnum("report_status", ["pending", "reviewed", "dismissed"]);

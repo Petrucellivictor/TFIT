@@ -25,7 +25,7 @@ Conventions:
 
 | Table | Purpose |
 |---|---|
-| `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred to Phase 6 (3D/Motion), which is where media actually gets produced. |
+| `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred to Phase 7 (3D/Motion), which is where media actually gets produced. |
 | `workout_plans` | A plan: split name, days/week, status, and the "why this workout" reasoning text (master spec §13; nullable — only AI-generated plans have one, see Phase 5). |
 | `workouts` | One training day within a plan. |
 | `workout_exercises` | The exercise prescriptions (sets/reps/rest/order) within a workout. |
@@ -67,11 +67,24 @@ Added ahead of the original phase order at the user's request.
 | `workout_plans.source` | `ai_generated` \| `manual` \| `copied` \| `shared` — plans are now a library per user, not one AI-generated singleton. |
 | `workout_plans.shared_by_user_id` / `.source_plan_id` | Provenance for copied/shared plans (who sent it, and which plan it came from). Nullable; only set for `copied`/`shared` sources. |
 
-Sharing a plan to another user is an instant deep-copy keyed by an exact `@handle` lookup against `profiles.handle` — there's no friends graph or notifications system yet (that's Phase 6), so "sending" a workout means the recipient just finds a new (archived, not auto-activated) plan in their library.
+Sharing a plan to another user is an instant deep-copy keyed by an exact `@handle` lookup against `profiles.handle` — at the time this shipped (Phase 5) there was no friends graph or notifications system yet (that arrived in Phase 6, below), so "sending" a workout meant the recipient just found a new (archived, not auto-activated) plan in their library. This behavior is unchanged now that follow/notifications exist — sharing still isn't gated by being followed.
 
-## Phase 6 — Social
+## Phase 6 (implemented now) — Social
 
-`friendships`, `followers`, `posts`, `post_media`, `post_likes`, `post_comments`, `post_reactions`, `saved_posts`, `notifications`, `reports`, `blocked_users`, `privacy_settings`.
+| Table | Purpose |
+|---|---|
+| `followers` | One row per follow relationship, with `status: pending \| accepted`. Following a public account inserts `accepted` directly; following a private account (`profiles.is_private`) inserts `pending` until the target accepts. This single table covers both the master spec's `followers` *and* `friendships`: a "friend" is computed as a pair of mutual `accepted` rows, not stored separately — storing it twice would just be a sync hazard between two tables that must always agree. |
+| `blocked_users` | Blocker → blocked pair. Enforced at every social read path (feed, follow, comments, profile view) — see `packages/social`. |
+| `posts` | `type` (`photo \| workout \| achievement \| personal_record \| streak \| text`), `caption`, `visibility` (`public \| followers \| friends \| private`), and a `metadata` jsonb for type-specific display data captured at creation time (e.g. a PR post's exercise/weight/reps) rather than a live join back to `personal_records` — a post should keep showing what was true when it was posted even if the underlying record later changes. Soft-deleted via `deleted_at`. |
+| `post_media` | Photos attached to a post (Vercel Blob URLs). Video is deferred — master spec §23 allows it, but it adds duration/thumbnail/transcoding concerns worth their own pass; photo-only ships now. |
+| `post_likes` | One row per (post, user) like — a simple boolean-presence like, not the master spec's richer `post_reactions` (multiple emoji types). Reactions are a nice-to-have layered on the same table shape later; a single like is what actually matters for the like count and notification. |
+| `post_comments` | Flat (non-threaded) comments, soft-deleted via `deleted_at`. |
+| `notifications` | In-app only for now — `type` (`new_follower \| follow_request \| comment \| like \| achievement_unlocked`), an actor, a reference, and `is_read`. Push delivery (Expo Push) is deferred; this phase ships the data model and an in-app list, which is most of the value without needing push-token registration yet. |
+| `reports` | `target_type` (`post \| comment \| user`), reason, free-text details, and a status a future admin panel (Phase 9) will work. Recording the report is the safety-critical part; a full moderation queue UI comes later — master spec's Content Moderation Agent (13) is explicitly meant to *feed* human review, not replace it, so this is the correct foundation to ship first. |
+
+**Deferred, documented, not forgotten**: `saved_posts` (bookmarking), `post_reactions` (multi-emoji beyond like), automated AI content moderation (Agent 13 — needs a working AI Gateway, which is still pending the Vercel billing blocker from Phase 2), and a dedicated `privacy_settings` table (per-post `visibility` plus `profiles.is_private` plus blocking already cover the load-bearing cases; granular settings like "who can comment" can extend `user_preferences` later without a new table).
+
+The feed (`GET /api/feed`) is a straightforward reverse-chronological query over posts from people the caller follows (plus their own), filtered by `canViewPost` — no relevance/ranking algorithm. The master spec itself warns against an "excessively addictive" feed (§26); recency + visibility is the honest version of that until real usage data would justify anything more.
 
 ## Phase 8 — Professionals (remaining) / monetization
 

@@ -11,10 +11,12 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 /api/training        (Phase 2 — agent orchestration entry points)
 /api/progress        (Phase 3)
 /api/checkins        (Phase 3)
-/api/social          (Phase 6)
+/api/feed            (Phase 6)
 /api/posts           (Phase 6)
-/api/friends         (Phase 6)
-/api/followers       (Phase 6)
+/api/comments        (Phase 6)
+/api/follow          (Phase 6 — followers/friends graph, computed from mutual accepted follows)
+/api/blocks          (Phase 6)
+/api/reports         (Phase 6)
 /api/challenges      (Phase 4)
 /api/gamification    (Phase 4)
 /api/notifications   (Phase 4/6)
@@ -82,3 +84,27 @@ XP/streak/achievement side effects are attached to the actions that earn them ra
 | `POST` | `/api/workouts/plans/:id/duplicate` | Deep-copy one of the caller's own plans into a new archived plan they own (`source: "copied"`). |
 | `POST` | `/api/workouts/plans/:id/share` | Deep-copy one of the caller's own plans into another user's library by exact `{ handle }` — instant, no accept/reject step (no notifications system yet). |
 | `POST` | `/api/workouts/plans/:id/activate` | Archive the caller's other plans and make this one active. |
+
+## Phase 6 endpoints (implemented)
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/feed` | Reverse-chronological posts from the caller + accepted follows (`?before=<ISO>` cursor, page size 20). |
+| `POST` | `/api/posts` | Create a post (`type`, `caption?`, `visibility`, `mediaUrls?`, `metadata?`). |
+| `GET`/`DELETE` | `/api/posts/:id` | Fetch (visibility-checked) / soft-delete (owner only) a post. |
+| `POST`/`DELETE` | `/api/posts/:id/like` | Like / unlike a post. |
+| `GET`/`POST` | `/api/posts/:id/comments` | List / add a comment. |
+| `DELETE` | `/api/comments/:id` | Soft-delete the caller's own comment. |
+| `POST` | `/api/uploads/post-media` | Upload a post image (`multipart/form-data`, field `file`). Proxies to Vercel Blob server-side rather than issuing a client-upload token — see "Media upload" below. |
+| `GET` | `/api/users/:handle` | Public profile: counts, bio, `followStatus` (`none`/`pending`/`accepted`/`self`), `isFriend`. |
+| `GET` | `/api/users/:handle/posts` | That user's posts, filtered by what the caller is allowed to see. |
+| `GET` | `/api/users/:handle/followers` / `/following` | Accepted-only lists. |
+| `POST`/`DELETE` | `/api/follow/:userId` | Follow (auto-accepted unless the target is private, in which case `pending`) / unfollow (also cancels a pending request). |
+| `POST` | `/api/follow/:userId/accept` / `/reject` | Respond to an incoming pending follow request. |
+| `GET` | `/api/follow/requests` | The caller's incoming pending requests. |
+| `GET`/`POST`/`DELETE` | `/api/blocks`, `/api/blocks/:userId` | List / block (also severs any existing follow both ways) / unblock. |
+| `POST` | `/api/reports` | Report a post, comment, or user (`targetType`, `targetId`, `reason`, `details?`) — feeds a future admin review queue, no automated action yet. |
+| `GET` | `/api/notifications` | Latest 50 notifications (`new_follower`, `follow_request`, `comment`, `like`, `achievement_unlocked`). |
+| `POST` | `/api/notifications/read-all` | Mark all of the caller's notifications read. |
+
+**Media upload**: rather than Vercel Blob's client-upload token protocol (`@vercel/blob/client`'s `handleUpload`/`upload()`), which depends on browser-only shims (`undici`, Node `crypto`) that Metro doesn't reliably resolve for Expo, the mobile app compresses the image client-side (`expo-image-manipulator`, capped at a 1600px longest edge, JPEG quality 0.7) and uploads it as `multipart/form-data` to `/api/uploads/post-media`, which calls `@vercel/blob`'s server-side `put()` directly. The route enforces a 4 MB ceiling — comfortably under Vercel's fixed 4.5 MB Serverless Function request-body limit, and well above what the client-side compression step actually produces for a typical photo.

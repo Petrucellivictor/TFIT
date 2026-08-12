@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     "@tfit/fitness-engine",
     "@tfit/ai",
     "@tfit/gamification",
+    "@tfit/social",
   ],
 };
 
