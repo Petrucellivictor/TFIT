@@ -21,7 +21,7 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 /api/gamification    (Phase 4)
 /api/notifications   (Phase 4/6)
 /api/ai              (Phase 2 — internal orchestration, not directly client-callable for free-form prompts)
-/api/professionals    (Phase 5 — directory only; content/monetization is Phase 8)
+/api/professionals    (Phase 5 — directory; Phase 8 adds a per-professional service menu, no payment)
 ```
 
 ## Conventions
@@ -106,5 +106,18 @@ XP/streak/achievement side effects are attached to the actions that earn them ra
 | `POST` | `/api/reports` | Report a post, comment, or user (`targetType`, `targetId`, `reason`, `details?`) — feeds a future admin review queue, no automated action yet. |
 | `GET` | `/api/notifications` | Latest 50 notifications (`new_follower`, `follow_request`, `comment`, `like`, `achievement_unlocked`). |
 | `POST` | `/api/notifications/read-all` | Mark all of the caller's notifications read. |
+
+## Phase 8 endpoints (implemented)
+
+Phase 7 (Motion & badges) shipped no new backend endpoints — mobile-only, see `docs/ARCHITECTURE.md`.
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/professionals` | Directory listing now embeds each professional's active `services[]` (batched fetch, not N+1). |
+| `GET`/`POST` | `/api/professionals/me/services` | List all of the caller's own menu items (including hidden ones) / add a new one (max 20, auto-appended to the end). |
+| `PATCH`/`DELETE` | `/api/professionals/me/services/:id` | Edit a menu item (title/description/priceLabel/isActive) / remove it permanently — ownership-checked. |
+| `POST` | `/api/professionals/me/services/reorder` | Reorder the caller's own menu items (`{ orderedIds: string[] }`) — every ID's ownership is verified before applying. |
+
+**No payment, no intermediation, by explicit user direction**: the service menu is purely informational (a "cardápio" — title, optional description, optional freeform price label like `"R$150"` or `"A combinar"`). There is no checkout, no in-app transaction, and no booking flow of any kind; contacting a professional to actually close a service still happens entirely outside the app via the phone/WhatsApp/email/Instagram already on their listing (Phase 5). This is a hard scope boundary, not a placeholder — real payment would require a payment-processor business account (Stripe Connect, Mercado Pago Marketplace, ...) that only the account owner can provision, plus a business-model decision (commission vs. subscription), neither of which is in scope here.
 
 **Media upload**: rather than Vercel Blob's client-upload token protocol (`@vercel/blob/client`'s `handleUpload`/`upload()`), which depends on browser-only shims (`undici`, Node `crypto`) that Metro doesn't reliably resolve for Expo, the mobile app compresses the image client-side (`expo-image-manipulator`, capped at a 1600px longest edge, JPEG quality 0.7) and uploads it as `multipart/form-data` to `/api/uploads/post-media`, which calls `@vercel/blob`'s server-side `put()` directly. The route enforces a 4 MB ceiling — comfortably under Vercel's fixed 4.5 MB Serverless Function request-body limit, and well above what the client-side compression step actually produces for a typical photo.

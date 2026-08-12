@@ -7,6 +7,14 @@ export interface ProfessionalContact {
   email: string | null;
 }
 
+export interface ProfessionalServiceItem {
+  id: UUID;
+  title: string;
+  description: string | null;
+  priceLabel: string | null;
+  order: number;
+}
+
 export interface ProfessionalListing {
   userId: UUID;
   displayName: string;
@@ -16,6 +24,11 @@ export interface ProfessionalListing {
   bio: string;
   city: string | null;
   contact: ProfessionalContact;
+  services: ProfessionalServiceItem[];
+}
+
+export interface MyProfessionalServiceItem extends ProfessionalServiceItem {
+  isActive: boolean;
 }
 
 export interface MyProfessionalProfile {

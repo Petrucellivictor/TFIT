@@ -1,4 +1,4 @@
-import { ActivityIndicator, Linking } from "react-native";
+import { ActivityIndicator, Linking, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
@@ -22,11 +22,11 @@ export default function ProfessionalDetailScreen() {
     );
   }
 
-  const { contact } = professional;
+  const { contact, services } = professional;
 
   return (
     <Screen>
-      <Stack gap="lg" style={{ flex: 1, padding: 24 }}>
+      <ScrollView contentContainerStyle={{ padding: 24, gap: theme.space.lg }}>
         <Stack gap="xxs">
           <Text variant="title">{professional.displayName}</Text>
           <Text color="secondary">
@@ -38,6 +38,31 @@ export default function ProfessionalDetailScreen() {
         <Surface level="raised" style={{ padding: theme.space.md }}>
           <Text color="secondary">{professional.bio}</Text>
         </Surface>
+
+        {services.length > 0 ? (
+          <Stack gap="sm">
+            <Text variant="label" color="secondary">
+              CARDÁPIO
+            </Text>
+            <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.md }}>
+              {services.map((service, index) => (
+                <Stack key={service.id} gap="xxs" style={index > 0 ? { borderTopWidth: 1, borderTopColor: theme.colors.border.subtle, paddingTop: theme.space.sm } : undefined}>
+                  <Stack direction="row" justify="space-between" align="center">
+                    <Text variant="bodyStrong" style={{ flex: 1 }}>
+                      {service.title}
+                    </Text>
+                    {service.priceLabel ? <Text color="secondary">{service.priceLabel}</Text> : null}
+                  </Stack>
+                  {service.description ? (
+                    <Text variant="caption" color="secondary">
+                      {service.description}
+                    </Text>
+                  ) : null}
+                </Stack>
+              ))}
+            </Surface>
+          </Stack>
+        ) : null}
 
         <Stack gap="sm">
           <Text variant="label" color="secondary">
@@ -68,10 +93,10 @@ export default function ProfessionalDetailScreen() {
         <Stack direction="row" gap="xs" align="center">
           <Ionicons name="information-circle-outline" size={16} color={theme.colors.text.secondary} />
           <Text variant="caption" color="secondary" style={{ flex: 1 }}>
-            Informações fornecidas pelo próprio profissional — a TFIT não verifica credenciais.
+            Informações fornecidas pelo próprio profissional — a TFIT não verifica credenciais nem processa pagamentos.
           </Text>
         </Stack>
-      </Stack>
+      </ScrollView>
     </Screen>
   );
 }

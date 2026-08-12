@@ -78,12 +78,15 @@ function ProfileForm({ initialProfile }: { initialProfile: MyProfessionalProfile
       <Button label={saveProfile.isPending ? "Salvando..." : "Salvar"} onPress={onSubmit} disabled={!canSubmit || saveProfile.isPending} />
 
       {initialProfile ? (
-        <Button
-          label="Remover do diretório"
-          variant="secondary"
-          onPress={() => deactivateProfile.mutate(undefined, { onSuccess: () => router.back() })}
-          disabled={deactivateProfile.isPending}
-        />
+        <>
+          <Button label="Editar meu cardápio" variant="secondary" onPress={() => router.push("/(app)/personal/menu")} />
+          <Button
+            label="Remover do diretório"
+            variant="secondary"
+            onPress={() => deactivateProfile.mutate(undefined, { onSuccess: () => router.back() })}
+            disabled={deactivateProfile.isPending}
+          />
+        </>
       ) : null}
     </ScrollView>
   );

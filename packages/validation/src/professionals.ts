@@ -16,3 +16,23 @@ export const professionalProfileInputSchema = z
   );
 
 export type ProfessionalProfileInput = z.infer<typeof professionalProfileInputSchema>;
+
+export const professionalServiceInputSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  description: z.string().trim().max(500).optional(),
+  priceLabel: z.string().trim().max(60).optional(),
+});
+
+export type ProfessionalServiceInput = z.infer<typeof professionalServiceInputSchema>;
+
+export const professionalServiceUpdateSchema = professionalServiceInputSchema.partial().extend({
+  isActive: z.boolean().optional(),
+});
+
+export type ProfessionalServiceUpdateInput = z.infer<typeof professionalServiceUpdateSchema>;
+
+export const reorderProfessionalServicesSchema = z.object({
+  orderedIds: z.array(z.string().uuid()).min(1).max(20),
+});
+
+export type ReorderProfessionalServicesInput = z.infer<typeof reorderProfessionalServicesSchema>;

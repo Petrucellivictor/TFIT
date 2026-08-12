@@ -86,9 +86,13 @@ Sharing a plan to another user is an instant deep-copy keyed by an exact `@handl
 
 The feed (`GET /api/feed`) is a straightforward reverse-chronological query over posts from people the caller follows (plus their own), filtered by `canViewPost` — no relevance/ranking algorithm. The master spec itself warns against an "excessively addictive" feed (§26); recency + visibility is the honest version of that until real usage data would justify anything more.
 
-## Phase 8 — Professionals (remaining) / monetization
+## Phase 8 (implemented now) — Professionals: service menu
 
-`professional_profiles` shipped in Phase 5 (directory only). What's left here per the master spec's §25 "possibilidades futuras": `professional_content`, `subscriptions`, and any verification/legal structuring needed before claiming credential checks.
+| Table | Purpose |
+|---|---|
+| `professional_services` | A menu of offerings on a professional's listing: `title`, optional `description`, optional freeform `price_label` (e.g. `"R$150"`, `"A combinar"` — not a decimal column, deliberately, since nothing computes on it), `order` for manual reordering (same pattern as `post_media.order`), and `is_active` for hide-without-losing (same convention as its parent `professional_profiles.is_active`, not the `posts`/`post_comments` family's `deleted_at` soft-delete — this table follows its immediate parent's convention). FK to `professional_profiles.user_id`, cascade delete. |
+
+**Explicitly out of scope, at the user's own request, not merely deferred**: no `subscriptions` table, no payment/transaction records, no verification/credential fields. The master spec's §25 "possibilidades futuras" (professional content, subscriptions, verification) is not just postponed — the user directly said they want contact-only ("como se fosse um cardápio... não quero sistema de pagamento e nenhuma intermediação"), so this is a settled scope boundary for the product, not a technical limitation to revisit later. If that changes, it would need a genuinely new phase: a payment-processor business account (Stripe Connect / Mercado Pago Marketplace) provisioned by the account owner, plus real credential-verification structuring — both explicitly called out in the master spec as needing groundwork before implementation, not something to bolt on incrementally.
 
 ## Entity relationship sketch (Phase 1 subset)
 

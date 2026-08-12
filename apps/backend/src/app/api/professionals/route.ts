@@ -3,6 +3,7 @@ import { getDb, professionalProfiles, profiles } from "@tfit/database";
 import type { ProfessionalListing } from "@tfit/types";
 import { jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
+import { mapActiveServicesByProfessional } from "@/lib/professionalServices";
 
 /**
  * A contact directory, not a marketplace — no payment/booking flow, no
@@ -30,6 +31,8 @@ export async function GET(req: Request) {
     .innerJoin(profiles, eq(professionalProfiles.userId, profiles.userId))
     .where(and(...conditions));
 
+  const servicesByProfessional = await mapActiveServicesByProfessional(rows.map((r) => r.professional.userId));
+
   const listings: ProfessionalListing[] = rows.map(({ professional, profile }) => ({
     userId: professional.userId,
     displayName: profile.displayName,
@@ -44,6 +47,7 @@ export async function GET(req: Request) {
       instagram: professional.contactInstagram,
       email: professional.contactEmail,
     },
+    services: servicesByProfessional.get(professional.userId) ?? [],
   }));
 
   return jsonOk({ professionals: listings });

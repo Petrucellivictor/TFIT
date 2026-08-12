@@ -19,6 +19,7 @@ export * from "./streaks";
 export * from "./achievements";
 export * from "./challenges";
 export * from "./professionalProfiles";
+export * from "./professionalServices";
 export * from "./social";
 export * from "./posts";
 export * from "./notifications";

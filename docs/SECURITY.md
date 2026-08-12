@@ -53,7 +53,15 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 
 - No field or UI claims TFIT has verified a trainer's credentials, identity, or qualifications. The mobile directory and detail screens show an explicit disclaimer to that effect.
 - No payment, booking, or contract flow exists — contact happens outside the app (WhatsApp/phone/Instagram/email via `Linking`), so TFIT is never a party to whatever the user and trainer agree to.
-- Anyone can list themselves; there's no application/approval step. If abuse surfaces (fake listings, harassment via the directory), moderation tooling is a Phase 8/9 admin-panel concern, same as content moderation generally.
+- Anyone can list themselves; there's no application/approval step. If abuse surfaces (fake listings, harassment via the directory), moderation tooling is a Phase 9 admin-panel concern, same as content moderation generally.
+
+## Professional service menu (Phase 8)
+
+Phase 8 extended the directory with `professional_services` — a per-professional menu of offerings (title, description, freeform price label). This inherits every scope limit above unchanged, plus one made explicit by the user directly (not just carried over from the master spec): **no payment processing and no in-app intermediation of any kind**. Concretely:
+
+- There is no price *column* with numeric/currency semantics — `price_label` is a freeform display string, which is a deliberate choice against ever computing, charging, or splitting a real amount from it.
+- No checkout, cart, invoice, or booking-confirmation flow exists anywhere in this feature. A user who wants a listed service still has to reach the professional through the same external contact methods as Phase 5.
+- Real payment support was explicitly ruled out for this phase rather than merely postponed: it would require a payment-processor business account (Stripe Connect, Mercado Pago Marketplace) that only the account owner can create — involving their own KYC/bank details — which isn't something achievable through code alone, plus a business-model decision (commission vs. subscription) that's the account owner's call, not a technical one.
 
 ## Workout sharing (Phase 5)
 
