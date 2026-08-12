@@ -25,14 +25,28 @@ export interface WorkoutDetail {
   exercises: WorkoutExerciseDetail[];
 }
 
+export type WorkoutPlanSource = "ai_generated" | "manual" | "copied" | "shared";
+
 export interface WorkoutPlanDetail {
   id: UUID;
   splitName: string;
   daysPerWeek: number;
   status: "active" | "archived";
-  reasoning: string;
+  reasoning: string | null;
+  source: WorkoutPlanSource;
+  sharedByHandle: string | null;
   createdAt: ISODateTime;
   workouts: WorkoutDetail[];
+}
+
+export interface WorkoutPlanSummary {
+  id: UUID;
+  splitName: string;
+  daysPerWeek: number;
+  status: "active" | "archived";
+  source: WorkoutPlanSource;
+  sharedByHandle: string | null;
+  createdAt: ISODateTime;
 }
 
 export type SetFeedback = "easy" | "adequate" | "hard" | "very_hard";

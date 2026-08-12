@@ -47,6 +47,18 @@ Auth is **not** hand-rolled. Clerk (`@clerk/nextjs` on the backend, `@clerk/cler
 - User-generated text (bio, post captions) that reaches an agent prompt is passed as clearly delimited **data**, never concatenated into the **system instruction** — prevents prompt injection from steering agent behavior (e.g., a bio containing "ignore previous instructions").
 - No agent call result is applied to the database without passing the deterministic rules engine (`packages/fitness-engine`) — see `docs/AGENTS.md`. This is also a security boundary: it bounds the blast radius of a compromised or manipulated model response.
 
+## Professional directory (Phase 5)
+
+`professional_profiles` is a **self-reported contact directory, not a verified marketplace** — this is a deliberate scope limit, not an oversight (master spec §25: "não implementar funcionalidades profissionais que exijam validação legal sem primeiro estruturar verificação adequada"). Concretely:
+
+- No field or UI claims TFIT has verified a trainer's credentials, identity, or qualifications. The mobile directory and detail screens show an explicit disclaimer to that effect.
+- No payment, booking, or contract flow exists — contact happens outside the app (WhatsApp/phone/Instagram/email via `Linking`), so TFIT is never a party to whatever the user and trainer agree to.
+- Anyone can list themselves; there's no application/approval step. If abuse surfaces (fake listings, harassment via the directory), moderation tooling is a Phase 8/9 admin-panel concern, same as content moderation generally.
+
+## Workout sharing (Phase 5)
+
+Sharing a plan looks up the recipient by exact `profiles.handle` and deep-copies the plan into their library server-side — it does not read anything back from the recipient (no privacy leak: a private profile can still receive a shared plan, since the sender only needs to know the handle, not view the profile). The copy lands `archived`, so it's inert until the recipient chooses to activate it — nothing about a user's active training plan changes without their action.
+
 ## Open items tracked, not yet due
 
 - Formal threat model / pen-test pass: scheduled for Phase 8 polish, once the full surface (social + professional features) exists.

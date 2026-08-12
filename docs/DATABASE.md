@@ -26,7 +26,7 @@ Conventions:
 | Table | Purpose |
 |---|---|
 | `exercise_library` | The validated exercise dataset agents select from — never invented. Muscles/equipment/contraindications are `text[]` columns rather than separate join tables (`exercise_muscles`/`exercise_equipment`/`exercise_restrictions` from the master spec's list) since there's no search/filter UI yet that needs normalized querying — revisit if that changes. `exercise_variations`/`exercise_media`/`exercise_animations` are deferred to Phase 6 (3D/Motion), which is where media actually gets produced. |
-| `workout_plans` | A generated plan: split name, days/week, status, and the "why this workout" reasoning text (master spec §13). |
+| `workout_plans` | A plan: split name, days/week, status, and the "why this workout" reasoning text (master spec §13; nullable — only AI-generated plans have one, see Phase 5). |
 | `workouts` | One training day within a plan. |
 | `workout_exercises` | The exercise prescriptions (sets/reps/rest/order) within a workout. |
 | `workout_sessions` | An instance of actually doing a workout. |
@@ -57,13 +57,25 @@ The master spec's `progression_history` isn't a physical table: strength progres
 
 The master spec's `levels` isn't a table: level names and XP thresholds are static app content (like the FIT Score formula), so they live as a constant in `packages/gamification` rather than rows that would never actually change per-deployment without a code change anyway.
 
-## Phase 5 — Social
+## Phase 5 (implemented now) — Professionals directory & manual/shared workouts
+
+Added ahead of the original phase order at the user's request.
+
+| Table / column | Purpose |
+|---|---|
+| `professional_profiles` | Self-registered trainer directory listing (specialty, bio, city, contact fields, `is_active`). Deliberately has **no verification/"verified" flag** — master spec §25 warns against implying credential validation without structuring real verification first. A contact directory, not a marketplace: no payment or booking flow. |
+| `workout_plans.source` | `ai_generated` \| `manual` \| `copied` \| `shared` — plans are now a library per user, not one AI-generated singleton. |
+| `workout_plans.shared_by_user_id` / `.source_plan_id` | Provenance for copied/shared plans (who sent it, and which plan it came from). Nullable; only set for `copied`/`shared` sources. |
+
+Sharing a plan to another user is an instant deep-copy keyed by an exact `@handle` lookup against `profiles.handle` — there's no friends graph or notifications system yet (that's Phase 6), so "sending" a workout means the recipient just finds a new (archived, not auto-activated) plan in their library.
+
+## Phase 6 — Social
 
 `friendships`, `followers`, `posts`, `post_media`, `post_likes`, `post_comments`, `post_reactions`, `saved_posts`, `notifications`, `reports`, `blocked_users`, `privacy_settings`.
 
-## Phase 7 — Professionals / monetization
+## Phase 8 — Professionals (remaining) / monetization
 
-`professional_profiles`, `professional_content`, `subscriptions`.
+`professional_profiles` shipped in Phase 5 (directory only). What's left here per the master spec's §25 "possibilidades futuras": `professional_content`, `subscriptions`, and any verification/legal structuring needed before claiming credential checks.
 
 ## Entity relationship sketch (Phase 1 subset)
 

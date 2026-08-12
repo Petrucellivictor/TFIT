@@ -3,17 +3,20 @@ import { useLocalSearchParams, useRouter, Stack as RouterStack } from "expo-rout
 import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
+import { useWorkoutPlanDetail } from "@/hooks/useWorkoutPlans";
 import { useStartSession } from "@/hooks/useWorkoutSession";
 import { ApiRequestError } from "@/lib/api";
 
 export default function WorkoutDetailScreen() {
-  const { workoutId } = useLocalSearchParams<{ workoutId: string }>();
+  const { workoutId, planId } = useLocalSearchParams<{ workoutId: string; planId?: string }>();
   const theme = useTheme();
   const router = useRouter();
-  const { data } = useWorkoutPlan();
+  const activePlan = useWorkoutPlan();
+  const specificPlan = useWorkoutPlanDetail(planId);
   const startSession = useStartSession();
 
-  const workout = data?.plan?.workouts.find((w) => w.id === workoutId);
+  const source = planId ? specificPlan.data?.plan : activePlan.data?.plan;
+  const workout = source?.workouts.find((w) => w.id === workoutId);
 
   if (!workout) {
     return (

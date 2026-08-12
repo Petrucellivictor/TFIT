@@ -88,3 +88,10 @@ export const challengeParticipantStatusEnum = pgEnum("challenge_participant_stat
   "completed",
   "failed",
 ]);
+
+export const workoutPlanSourceEnum = pgEnum("workout_plan_source", [
+  "ai_generated",
+  "manual",
+  "copied",
+  "shared",
+]);

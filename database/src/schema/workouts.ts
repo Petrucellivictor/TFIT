@@ -1,7 +1,7 @@
-import { pgTable, uuid, text, integer, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, timestamp, index, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { exerciseLibrary } from "./exerciseLibrary";
-import { workoutPlanStatusEnum } from "./enums";
+import { workoutPlanStatusEnum, workoutPlanSourceEnum } from "./enums";
 
 export const workoutPlans = pgTable(
   "workout_plans",
@@ -13,8 +13,13 @@ export const workoutPlans = pgTable(
     splitName: text("split_name").notNull(),
     daysPerWeek: integer("days_per_week").notNull(),
     status: workoutPlanStatusEnum("status").notNull().default("active"),
-    /** The "why this workout" explanation shown to the user — see master spec §13. */
-    reasoning: text("reasoning").notNull(),
+    /** The "why this workout" explanation shown to the user (master spec §13) for AI-generated plans; null for manual ones. */
+    reasoning: text("reasoning"),
+    source: workoutPlanSourceEnum("source").notNull().default("ai_generated"),
+    /** Who shared/copied this plan to the owning user, if applicable — not the owner. */
+    sharedByUserId: uuid("shared_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    /** The plan this one was copied/shared from, if applicable. */
+    sourcePlanId: uuid("source_plan_id").references((): AnyPgColumn => workoutPlans.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("workout_plans_user_status_idx").on(table.userId, table.status)],

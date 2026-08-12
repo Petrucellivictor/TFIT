@@ -70,11 +70,11 @@ infrastructure/   IaC / environment notes (mostly Vercel + Marketplace config as
 2. **Fitness core** ✅ (code complete; live end-to-end test pending a credit card on the Vercel account for the AI Gateway — see §6): assessment, exercise library, deterministic workout engine, the 7 generation-pipeline agents wired for real, workout mode. The remaining 8 agents (recovery, social, gamification, motivation, moderation, QA, code-review) stay as design contracts until their phases.
 3. **Evolution** ✅: check-ins, body measurements, user-defined goals, and the FIT Score, backed by an evolution dashboard. Progression history is a query over Phase 2 data rather than a new table (docs/DATABASE.md).
 4. **Gamification** ✅: XP (deterministic, not an LLM call — see docs/AGENTS.md's revised Gamification Agent note), levels, streaks with a freeze/recovery mechanic, achievements, and system-created public challenges. Friend-vs-friend challenges wait for the Phase 5 social graph.
-4. **Gamification**: XP, levels, streaks, achievements, challenges.
-5. **Social**: profiles, feed, posts, friends, followers, comments.
-6. **3D/Motion**: exercise 3D demonstrations, badges, microinteractions.
-7. **Professionals**: professional profiles, content, verification groundwork.
-8. **Polish**: performance, accessibility, security hardening, full test suite, admin panel, visual refinement.
+5. **Professionals directory & manual/shared workouts** ✅ — inserted ahead of schedule at the user's request, not in the original 8-phase plan. A contact directory for self-registered trainers (no payment/booking flow, no credential verification — master spec §25 explicitly warns against implying verification without structuring it first), plus evolving workout plans from AI-only to a library: manual creation via an exercise picker, duplicating a plan, and sending a copy to another user by exact @handle (no notifications/friends system yet, so sharing is an instant copy, not a request). Manual plans go through the same deterministic rules engine as AI ones, but structural violations (invented exercise, bad numbers) hard-block while health/volume concerns surface as warnings — a self-authored plan is an informed choice, not a pushed recommendation (docs/AGENTS.md).
+6. **Social**: feed, posts, friends, followers, comments. The `@handle` lookup from Phase 5's sharing is the seed of this — Phase 6 turns it into a real graph (follow, not just "I know your handle").
+7. **3D/Motion**: exercise 3D demonstrations, badges, microinteractions.
+8. **Professionals — remaining scope**: professional content/programs, verification/legal groundwork, monetization. The directory itself shipped in Phase 5; this is what's left per the master spec's original §25 "possibilidades futuras."
+9. **Polish**: performance, accessibility, security hardening, full test suite, admin panel, visual refinement.
 
 ## 6. Key risks
 

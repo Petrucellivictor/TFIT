@@ -1,12 +1,14 @@
 import { asc, eq, inArray } from "drizzle-orm";
-import { getDb, workoutPlans, workouts, workoutExercises, exerciseLibrary } from "@tfit/database";
+import { getDb, workoutPlans, workouts, workoutExercises, exerciseLibrary, profiles } from "@tfit/database";
 
 export interface WorkoutPlanDetail {
   id: string;
   splitName: string;
   daysPerWeek: number;
   status: "active" | "archived";
-  reasoning: string;
+  reasoning: string | null;
+  source: "ai_generated" | "manual" | "copied" | "shared";
+  sharedByHandle: string | null;
   createdAt: string;
   workouts: {
     id: string;
@@ -48,6 +50,10 @@ export async function buildPlanDetail(planId: string): Promise<WorkoutPlanDetail
   const plan = await db.query.workoutPlans.findFirst({ where: eq(workoutPlans.id, planId) });
   if (!plan) return null;
 
+  const sharedByProfile = plan.sharedByUserId
+    ? await db.query.profiles.findFirst({ where: eq(profiles.userId, plan.sharedByUserId) })
+    : null;
+
   const workoutRows = await db
     .select()
     .from(workouts)
@@ -77,6 +83,8 @@ export async function buildPlanDetail(planId: string): Promise<WorkoutPlanDetail
     daysPerWeek: plan.daysPerWeek,
     status: plan.status,
     reasoning: plan.reasoning,
+    source: plan.source,
+    sharedByHandle: sharedByProfile?.handle ?? null,
     createdAt: plan.createdAt.toISOString(),
     workouts: workoutRows.map((w) => ({
       id: w.id,

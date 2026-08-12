@@ -38,6 +38,7 @@ function WorkoutCard({ workout, onPress }: { workout: WorkoutDetail; onPress: ()
 
 function GenerateEmptyState() {
   const theme = useTheme();
+  const router = useRouter();
   const generate = useGenerateWorkout();
 
   return (
@@ -66,6 +67,9 @@ function GenerateEmptyState() {
             : "Não conseguimos gerar seu treino agora. Tente novamente."}
         </Text>
       ) : null}
+      <Text color="secondary">ou</Text>
+      <Button label="Criar treino manualmente" variant="secondary" onPress={() => router.push("/(app)/treinos/builder")} />
+      <Button label="Ver meus planos" variant="secondary" onPress={() => router.push("/(app)/treinos/plans")} />
     </Stack>
   );
 }
@@ -117,19 +121,30 @@ export default function TreinosScreen() {
         ItemSeparatorComponent={() => <Stack style={{ height: theme.space.sm }} />}
         ListHeaderComponent={
           <Stack gap="sm" style={{ marginBottom: theme.space.md }}>
-            <Text variant="title">{plan.splitName}</Text>
-            <Pressable onPress={() => setShowReasoning((v) => !v)}>
-              <Stack direction="row" gap="xxs" align="center">
-                <Ionicons name="information-circle-outline" size={16} color={theme.colors.accent.primary} />
-                <Text variant="label" color="primary" style={{ color: theme.colors.accent.primary }}>
-                  Por que esse treino?
+            <Stack direction="row" justify="space-between" align="center">
+              <Text variant="title">{plan.splitName}</Text>
+              <Pressable onPress={() => router.push("/(app)/treinos/plans")}>
+                <Text variant="label" style={{ color: theme.colors.accent.primary }}>
+                  Meus planos
                 </Text>
-              </Stack>
-            </Pressable>
-            {showReasoning ? (
-              <Surface level="sunken" style={{ padding: theme.space.md }}>
-                <Text color="secondary">{plan.reasoning}</Text>
-              </Surface>
+              </Pressable>
+            </Stack>
+            {plan.reasoning ? (
+              <>
+                <Pressable onPress={() => setShowReasoning((v) => !v)}>
+                  <Stack direction="row" gap="xxs" align="center">
+                    <Ionicons name="information-circle-outline" size={16} color={theme.colors.accent.primary} />
+                    <Text variant="label" color="primary" style={{ color: theme.colors.accent.primary }}>
+                      Por que esse treino?
+                    </Text>
+                  </Stack>
+                </Pressable>
+                {showReasoning ? (
+                  <Surface level="sunken" style={{ padding: theme.space.md }}>
+                    <Text color="secondary">{plan.reasoning}</Text>
+                  </Surface>
+                ) : null}
+              </>
             ) : null}
           </Stack>
         }

@@ -35,7 +35,7 @@ Every screen must define, before implementation (master spec §57): loading, suc
 
 ## Navigation shape (master spec §49)
 
-Bottom tab bar: `Home`, `Treinos`, `+` (center action: start workout / post / check-in), `Feed`, `Perfil`. Kept intentionally shallow — this is validated against real usage in Phase 5+ once social features add depth.
+Bottom tab bar: `Home`, `Treinos`, `Personal`, `Feed`, `Perfil`, plus a floating `+` action button overlaid on the bar (start workout / check-in / post) rather than consuming a tab slot. `Personal` (the trainer directory, Phase 5) was added to the original 4-tab plan at the user's request — 5 tabs plus an overlaid FAB is still within normal mobile bottom-nav bounds. Revisit if Phase 6 social features want more room.
 
 ## Component philosophy
 

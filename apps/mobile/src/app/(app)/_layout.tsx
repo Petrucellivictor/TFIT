@@ -10,6 +10,7 @@ import { QuickActionSheet } from "@/components/QuickActionSheet";
 const TAB_ICONS: Record<string, string> = {
   index: "home",
   treinos: "barbell",
+  personal: "school",
   feed: "people",
   perfil: "person",
 };
@@ -43,6 +44,7 @@ export default function AppLayout() {
       >
         <Tabs.Screen name="index" options={{ title: "Home" }} />
         <Tabs.Screen name="treinos" options={{ title: "Treinos" }} />
+        <Tabs.Screen name="personal" options={{ title: "Personal" }} />
         <Tabs.Screen name="feed" options={{ title: "Feed" }} />
         <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
       </Tabs>

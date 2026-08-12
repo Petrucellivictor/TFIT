@@ -18,3 +18,4 @@ export * from "./xpTransactions";
 export * from "./streaks";
 export * from "./achievements";
 export * from "./challenges";
+export * from "./professionalProfiles";

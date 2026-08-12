@@ -14,6 +14,8 @@ LLM agent output → packages/fitness-engine (deterministic validation) → Safe
 
 No agent's raw output is ever written directly to `workout_plans`/`workouts`. This is enforced in code (route handlers call the rules engine, not the AI client, as the final step) — not a convention agents are asked to follow.
 
+**Extended in Phase 5**: manually-created plans (`POST /api/workouts/plans`) go through the same `reviewWorkoutPlan` call, but with a different failure mode. Structural violations (an exercise ID that doesn't exist, nonsensical sets/reps/rest) still hard-block — those are never acceptable regardless of who authored the plan. Health/volume violations (contraindicated exercise, excessive weekly volume) are downgraded to non-blocking `warnings` for self-authored plans: a person choosing their own exercises is making an informed choice, not receiving a pushed AI recommendation, so the bar for overriding them is higher. See `apps/backend/src/lib/workoutPlans.ts`.
+
 ## Agent catalog
 
 | # | Agent | Input | Output | Notes |

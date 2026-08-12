@@ -11,15 +11,15 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 /api/training        (Phase 2 — agent orchestration entry points)
 /api/progress        (Phase 3)
 /api/checkins        (Phase 3)
-/api/social          (Phase 5)
-/api/posts           (Phase 5)
-/api/friends         (Phase 5)
-/api/followers       (Phase 5)
+/api/social          (Phase 6)
+/api/posts           (Phase 6)
+/api/friends         (Phase 6)
+/api/followers       (Phase 6)
 /api/challenges      (Phase 4)
 /api/gamification    (Phase 4)
-/api/notifications   (Phase 4/5)
+/api/notifications   (Phase 4/6)
 /api/ai              (Phase 2 — internal orchestration, not directly client-callable for free-form prompts)
-/api/professionals    (Phase 7)
+/api/professionals    (Phase 5 — directory only; content/monetization is Phase 8)
 ```
 
 ## Conventions
@@ -69,3 +69,16 @@ Next.js Route Handlers under `apps/backend/src/app/api/`, organized by domain (m
 | `POST` | `/api/challenges/:id/join` | Join a challenge (idempotent — returns the existing participation if already joined). |
 
 XP/streak/achievement side effects are attached to the actions that earn them rather than requiring a separate call: completing a workout session, submitting a check-in, logging a new personal record, and marking a goal achieved all return a `gamification` field in their response (`xpAwarded`, `streakEvent`, `newAchievements`, ...). See `src/lib/gamification.ts`.
+
+## Phase 5 endpoints (implemented)
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/exercises` | Search/filter the exercise library (`?search=`, `?muscle=`) — powers the manual workout builder's picker. |
+| `GET`/`PUT`/`DELETE` | `/api/professionals/me` | Get / upsert / deactivate the caller's own trainer directory listing. |
+| `GET` | `/api/professionals` | Browse the active trainer directory (`?search=` by name or specialty). |
+| `GET`/`POST` | `/api/workouts/plans` | List all of the caller's plans (summaries) / create a manual plan. Manual creation runs the same `@tfit/fitness-engine` review as AI plans, but only hard-blocks structural issues (invented exercise, bad numbers) — health/volume concerns come back as non-blocking `warnings`, since a self-authored plan is an informed choice, not a pushed recommendation. |
+| `GET` | `/api/workouts/plans/:id` | Full detail for one of the caller's plans (any status, not just active). |
+| `POST` | `/api/workouts/plans/:id/duplicate` | Deep-copy one of the caller's own plans into a new archived plan they own (`source: "copied"`). |
+| `POST` | `/api/workouts/plans/:id/share` | Deep-copy one of the caller's own plans into another user's library by exact `{ handle }` — instant, no accept/reject step (no notifications system yet). |
+| `POST` | `/api/workouts/plans/:id/activate` | Archive the caller's other plans and make this one active. |
