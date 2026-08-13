@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ScrollView, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, Stack, Surface, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import { Chip } from "@/components/Chip";
 import { Screen } from "@/components/Screen";
 import { ExercisePickerModal } from "@/components/ExercisePickerModal";
@@ -40,6 +40,7 @@ function newDay(index: number): BuilderDay {
 export default function WorkoutBuilderScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const toast = useToast();
   const createPlan = useCreateManualPlan();
 
   const [splitName, setSplitName] = useState("");
@@ -113,7 +114,12 @@ export default function WorkoutBuilderScreen() {
           })),
         })),
       },
-      { onSuccess: () => router.replace("/(app)/treinos/plans") },
+      {
+        onSuccess: () => {
+          toast.show("Treino salvo.", "success");
+          router.replace("/(app)/treinos/plans");
+        },
+      },
     );
   };
 

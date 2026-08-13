@@ -11,10 +11,14 @@ export interface ColorTokens {
     base: string;
     raised: string;
     sunken: string;
+    /** Momentary tone for a pressed surface (a row, a card) — distinct from `sunken`'s permanent recessed look. */
+    pressed: string;
   };
   text: {
     primary: string;
     secondary: string;
+    /** Deemphasized but still legible — between `secondary` and `disabled` (timestamps, helper captions). */
+    muted: string;
     inverse: string;
     disabled: string;
   };
@@ -37,7 +41,10 @@ export interface ColorTokens {
   /** Gradient stop pairs for CTAs, hero surfaces, and data-viz fills (LinearGradient / SVG). */
   gradient: {
     primary: readonly [string, string];
+    /** Always dark navy tones in BOTH themes (a deliberate fixed-dark hero panel, not theme-relative) — pair with `heroText`/`heroTextMuted`, never `text.inverse`, which flips meaning per theme and would go near-invisible in dark mode. */
     hero: readonly [string, string];
+    heroText: string;
+    heroTextMuted: string;
   };
 }
 
@@ -46,10 +53,12 @@ export const lightColors: ColorTokens = {
     base: "#F2F5F8",
     raised: "#FFFFFF",
     sunken: "#E6ECF1",
+    pressed: "#DCE4EA",
   },
   text: {
     primary: "#0B1420",
     secondary: "#57626F",
+    muted: "#7C8894",
     inverse: "#FFFFFF",
     disabled: "#9AA5B1",
   },
@@ -72,6 +81,8 @@ export const lightColors: ColorTokens = {
   gradient: {
     primary: ["#00B884", "#0091FF"],
     hero: ["#0B1420", "#173049"],
+    heroText: "#FFFFFF",
+    heroTextMuted: "#AEB9C4",
   },
 };
 
@@ -80,10 +91,12 @@ export const darkColors: ColorTokens = {
     base: "#060A10",
     raised: "#101823",
     sunken: "#03060A",
+    pressed: "#182231",
   },
   text: {
     primary: "#F3F7FA",
     secondary: "#8A97A8",
+    muted: "#647082",
     inverse: "#04140F",
     disabled: "#4C5866",
   },
@@ -106,5 +119,7 @@ export const darkColors: ColorTokens = {
   gradient: {
     primary: ["#1EF2A6", "#3DB2FF"],
     hero: ["#0B1420", "#0E2A3E"],
+    heroText: "#FFFFFF",
+    heroTextMuted: "#AEB9C4",
   },
 };

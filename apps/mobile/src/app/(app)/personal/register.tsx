@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, Stack, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import type { MyProfessionalProfile } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import {
@@ -14,6 +14,7 @@ import { ApiRequestError } from "@/lib/api";
 function ProfileForm({ initialProfile }: { initialProfile: MyProfessionalProfile | null }) {
   const theme = useTheme();
   const router = useRouter();
+  const toast = useToast();
   const saveProfile = useSaveProfessionalProfile();
   const deactivateProfile = useDeactivateProfessionalProfile();
 
@@ -41,7 +42,12 @@ function ProfileForm({ initialProfile }: { initialProfile: MyProfessionalProfile
         contactInstagram: contactInstagram.trim() || undefined,
         contactEmail: contactEmail.trim() || undefined,
       },
-      { onSuccess: () => router.back() },
+      {
+        onSuccess: () => {
+          toast.show("Perfil salvo.", "success");
+          router.back();
+        },
+      },
     );
   };
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Modal, Pressable } from "react-native";
-import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { BottomSheet, Button, Stack, Text, TextField } from "@tfit/ui";
 import type { CreateReportInput } from "@tfit/validation";
 import { Chip } from "./Chip";
 
@@ -16,7 +15,6 @@ export interface ReportModalProps {
 }
 
 export function ReportModal({ visible, onClose, targetType, targetId, onSubmit, isSubmitting }: ReportModalProps) {
-  const theme = useTheme();
   const [reason, setReason] = useState<string | null>(null);
   const [details, setDetails] = useState("");
 
@@ -32,43 +30,24 @@ export function ReportModal({ visible, onClose, targetType, targetId, onSubmit, 
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <Pressable
-        style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }}
-        onPress={handleClose}
-        accessibilityRole="button"
-        accessibilityLabel="Fechar"
-      >
-        <Pressable onPress={(e) => e.stopPropagation()}>
-          <Surface
-            level="raised"
-            style={{
-              padding: theme.space.lg,
-              borderTopLeftRadius: theme.radius.soft,
-              borderTopRightRadius: theme.radius.soft,
-              paddingBottom: theme.space.xl,
-            }}
-          >
-            <Stack gap="md">
-              <Text variant="headline">Por que você está denunciando isso?</Text>
-              <Stack direction="row" gap="xs" style={{ flexWrap: "wrap" }}>
-                {REASONS.map((option) => (
-                  <Chip key={option} label={option} selected={reason === option} onPress={() => setReason(option)} />
-                ))}
-              </Stack>
-              <TextField
-                label="Detalhes (opcional)"
-                placeholder="Conte mais sobre o que aconteceu"
-                value={details}
-                onChangeText={setDetails}
-                multiline
-                numberOfLines={3}
-              />
-              <Button label="Enviar denúncia" onPress={handleSubmit} disabled={!reason || isSubmitting} />
-            </Stack>
-          </Surface>
-        </Pressable>
-      </Pressable>
-    </Modal>
+    <BottomSheet visible={visible} onClose={handleClose}>
+      <Stack gap="md">
+        <Text variant="headline">Por que você está denunciando isso?</Text>
+        <Stack direction="row" gap="xs" style={{ flexWrap: "wrap" }}>
+          {REASONS.map((option) => (
+            <Chip key={option} label={option} selected={reason === option} onPress={() => setReason(option)} />
+          ))}
+        </Stack>
+        <TextField
+          label="Detalhes (opcional)"
+          placeholder="Conte mais sobre o que aconteceu"
+          value={details}
+          onChangeText={setDetails}
+          multiline
+          numberOfLines={3}
+        />
+        <Button label="Enviar denúncia" onPress={handleSubmit} disabled={!reason || isSubmitting} />
+      </Stack>
+    </BottomSheet>
   );
 }

@@ -1,6 +1,6 @@
-import { Modal, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { BottomSheet, Stack, Text, useTheme } from "@tfit/ui";
 
 export interface PostActionSheetProps {
   visible: boolean;
@@ -20,58 +20,41 @@ export function PostActionSheet({ visible, onClose, isOwnPost, onDelete, onRepor
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable
-        style={{ flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" }}
-        onPress={onClose}
-        accessibilityRole="button"
-        accessibilityLabel="Fechar"
-      >
-        <Surface
-          level="raised"
-          style={{
-            padding: theme.space.lg,
-            borderTopLeftRadius: theme.radius.soft,
-            borderTopRightRadius: theme.radius.soft,
-            paddingBottom: theme.space.xl,
-          }}
-        >
-          <Stack gap="md">
-            {isOwnPost ? (
+    <BottomSheet visible={visible} onClose={onClose}>
+      <Stack gap="md">
+        {isOwnPost ? (
+          <Pressable
+            onPress={() => onDelete && run(onDelete)}
+            style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
+          >
+            <Ionicons name="trash-outline" size={22} color={theme.colors.feedback.danger} />
+            <Text variant="bodyStrong" style={{ color: theme.colors.feedback.danger }}>
+              Excluir post
+            </Text>
+          </Pressable>
+        ) : (
+          <>
+            <Pressable
+              onPress={() => run(onReport)}
+              style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
+            >
+              <Ionicons name="flag-outline" size={22} color={theme.colors.text.primary} />
+              <Text variant="bodyStrong">Denunciar</Text>
+            </Pressable>
+            {onBlockAuthor ? (
               <Pressable
-                onPress={() => onDelete && run(onDelete)}
+                onPress={() => run(onBlockAuthor)}
                 style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
               >
-                <Ionicons name="trash-outline" size={22} color={theme.colors.feedback.danger} />
+                <Ionicons name="person-remove-outline" size={22} color={theme.colors.feedback.danger} />
                 <Text variant="bodyStrong" style={{ color: theme.colors.feedback.danger }}>
-                  Excluir post
+                  Bloquear usuário
                 </Text>
               </Pressable>
-            ) : (
-              <>
-                <Pressable
-                  onPress={() => run(onReport)}
-                  style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
-                >
-                  <Ionicons name="flag-outline" size={22} color={theme.colors.text.primary} />
-                  <Text variant="bodyStrong">Denunciar</Text>
-                </Pressable>
-                {onBlockAuthor ? (
-                  <Pressable
-                    onPress={() => run(onBlockAuthor)}
-                    style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
-                  >
-                    <Ionicons name="person-remove-outline" size={22} color={theme.colors.feedback.danger} />
-                    <Text variant="bodyStrong" style={{ color: theme.colors.feedback.danger }}>
-                      Bloquear usuário
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </>
-            )}
-          </Stack>
-        </Surface>
-      </Pressable>
-    </Modal>
+            ) : null}
+          </>
+        )}
+      </Stack>
+    </BottomSheet>
   );
 }

@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, Stack, Surface, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import type { PostType, PostVisibility } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { Chip } from "@/components/Chip";
@@ -23,6 +23,7 @@ export default function CreatePostScreen() {
   const router = useRouter();
   const { getToken } = useAuth();
   const createPost = useCreatePost();
+  const toast = useToast();
 
   const [asset, setAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [caption, setCaption] = useState("");
@@ -69,6 +70,7 @@ export default function CreatePostScreen() {
       }
 
       await createPost.mutateAsync({ type, caption: caption.trim() || undefined, visibility, mediaUrls });
+      toast.show("Post publicado.", "success");
       router.back();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não conseguimos publicar agora. Tente novamente.");

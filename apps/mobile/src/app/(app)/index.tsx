@@ -22,7 +22,25 @@ function isoDayOfWeek(date: Date): number {
   return jsDay === 0 ? 7 : jsDay;
 }
 
-function HeroHeader({ name, isLoading, isError }: { name: string | undefined; isLoading: boolean; isError: boolean }) {
+/** Contextual line under the greeting — adapts to the user's current state rather than a static tagline. */
+function contextualSubtitle(hasWorkoutToday: boolean, hasPlan: boolean, streakDays: number): string {
+  if (!hasPlan) return "Vamos montar seu plano de treino?";
+  if (streakDays >= 3) return "Pronto para manter sua sequência?";
+  if (hasWorkoutToday) return "Seu treino de hoje está esperando.";
+  return "Bora treinar?";
+}
+
+function HeroHeader({
+  name,
+  isLoading,
+  isError,
+  subtitle,
+}: {
+  name: string | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  subtitle: string;
+}) {
   const theme = useTheme();
 
   return (
@@ -48,11 +66,14 @@ function HeroHeader({ name, isLoading, isError }: { name: string | undefined; is
       {isLoading ? (
         <ActivityIndicator color={theme.colors.accent.primary} style={{ alignSelf: "flex-start", marginTop: theme.space.xs }} />
       ) : isError ? (
-        <Text color="inverse">Não conseguimos carregar seus dados agora. Puxe para atualizar.</Text>
+        <Text style={{ color: theme.colors.gradient.heroText }}>Não conseguimos carregar seus dados agora. Puxe para atualizar.</Text>
       ) : (
-        <Text variant="title" color="inverse">
-          {greeting()}, {name}
-        </Text>
+        <>
+          <Text variant="title" style={{ color: theme.colors.gradient.heroText }}>
+            {greeting()}, {name}
+          </Text>
+          <Text style={{ color: theme.colors.gradient.heroTextMuted }}>{subtitle}</Text>
+        </>
       )}
     </LinearGradient>
   );
@@ -103,14 +124,25 @@ export default function HomeScreen() {
   const theme = useTheme();
   const me = useMe();
   const plan = useWorkoutPlan();
+  const gamification = useGamificationProfile();
   const router = useRouter();
 
   const todayWorkout = plan.data?.plan?.workouts.find((w) => w.dayOfWeek === isoDayOfWeek(new Date()));
+  const subtitle = contextualSubtitle(
+    Boolean(todayWorkout),
+    Boolean(plan.data?.plan),
+    gamification.data?.streak.current ?? 0,
+  );
 
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ padding: 24, gap: theme.space.lg }}>
-        <HeroHeader name={me.data?.profile.displayName.split(" ")[0]} isLoading={me.isLoading} isError={me.isError} />
+        <HeroHeader
+          name={me.data?.profile.displayName.split(" ")[0]}
+          isLoading={me.isLoading}
+          isError={me.isError}
+          subtitle={subtitle}
+        />
 
         <GamificationSummary />
 

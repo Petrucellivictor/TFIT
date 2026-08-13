@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, Text, useTheme } from "@tfit/ui";
+import { Badge, EmptyState, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import type { PostSummary } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { PostCard } from "@/components/PostCard";
@@ -10,6 +10,22 @@ import { PostActionSheet } from "@/components/PostActionSheet";
 import { ReportModal } from "@/components/ReportModal";
 import { useMe } from "@/hooks/useMe";
 import { useBlockUser, useDeletePost, useFeed, useNotifications, useReportContent, useToggleLike } from "@/hooks/useSocial";
+
+function PostCardSkeleton() {
+  const theme = useTheme();
+  return (
+    <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.sm }}>
+      <Stack direction="row" gap="sm" align="center">
+        <Skeleton width={40} height={40} radius="pill" />
+        <Stack gap="xxs" style={{ flex: 1 }}>
+          <Skeleton width="50%" height={14} />
+          <Skeleton width="30%" height={11} />
+        </Stack>
+      </Stack>
+      <Skeleton height={220} radius="soft" />
+    </Surface>
+  );
+}
 
 export default function FeedScreen() {
   const theme = useTheme();
@@ -28,8 +44,9 @@ export default function FeedScreen() {
   if (feed.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="md" style={{ padding: 24 }}>
+          <PostCardSkeleton />
+          <PostCardSkeleton />
         </Stack>
       </Screen>
     );
@@ -38,10 +55,8 @@ export default function FeedScreen() {
   if (feed.isError) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1, padding: 32 }}>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Não conseguimos carregar o feed agora. Puxe para atualizar.
-          </Text>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar o feed agora." />
         </Stack>
       </Screen>
     );
@@ -76,34 +91,17 @@ export default function FeedScreen() {
             >
               <Stack direction="row" gap="xxs" align="center">
                 <Ionicons name="notifications-outline" size={24} color={theme.colors.text.primary} />
-                {unreadCount > 0 ? (
-                  <View
-                    style={{
-                      minWidth: 18,
-                      height: 18,
-                      borderRadius: theme.radius.pill,
-                      backgroundColor: theme.colors.feedback.danger,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingHorizontal: 4,
-                    }}
-                  >
-                    <Text variant="caption" color="inverse" style={{ fontSize: 10, lineHeight: 12 }}>
-                      {unreadCount}
-                    </Text>
-                  </View>
-                ) : null}
+                <Badge count={unreadCount} />
               </Stack>
             </Pressable>
           </Stack>
         }
         ListEmptyComponent={
-          <Stack align="center" justify="center" gap="sm" style={{ paddingTop: 64 }}>
-            <Ionicons name="people-outline" size={40} color={theme.colors.text.secondary} />
-            <Text color="secondary" style={{ textAlign: "center" }}>
-              Nenhum post ainda. Siga outras pessoas ou publique algo para começar.
-            </Text>
-          </Stack>
+          <EmptyState
+            icon={<Ionicons name="people-outline" size={40} color={theme.colors.text.secondary} />}
+            title="Nenhum post ainda"
+            description="Siga outras pessoas ou publique algo para começar."
+          />
         }
         ListFooterComponent={feed.isFetchingNextPage ? <ActivityIndicator style={{ marginTop: theme.space.md }} /> : null}
         renderItem={({ item }) => (

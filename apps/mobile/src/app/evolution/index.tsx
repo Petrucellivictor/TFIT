@@ -1,7 +1,7 @@
-import { ActivityIndicator, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Button, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { ScoreBar } from "@/components/ScoreBar";
 import { RadialGauge } from "@/components/RadialGauge";
@@ -23,8 +23,21 @@ export default function EvolutionScreen() {
   if (isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="lg" style={{ padding: 24 }}>
+          <Skeleton width="60%" height={28} />
+          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.md }}>
+            <Stack direction="row" align="center" gap="lg">
+              <Skeleton width={104} height={104} radius="pill" />
+              <Stack gap="sm" style={{ flex: 1 }}>
+                <Skeleton width="80%" height={16} />
+                <Skeleton width="60%" height={12} />
+              </Stack>
+            </Stack>
+          </Surface>
+          <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm }}>
+            <Skeleton width="40%" height={16} />
+            <Skeleton height={40} />
+          </Surface>
         </Stack>
       </Screen>
     );
@@ -33,10 +46,8 @@ export default function EvolutionScreen() {
   if (isError || !data) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1, padding: 32 }}>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Não conseguimos carregar sua evolução agora. Puxe para atualizar.
-          </Text>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar sua evolução agora." />
         </Stack>
       </Screen>
     );

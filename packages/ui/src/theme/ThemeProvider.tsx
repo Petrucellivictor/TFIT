@@ -4,6 +4,7 @@ import { lightColors, darkColors, type ColorTokens } from "../tokens/colors";
 import { typography } from "../tokens/typography";
 import { space, radius } from "../tokens/spacing";
 import { motion } from "../tokens/motion";
+import { elevation } from "../tokens/elevation";
 
 export type ThemePreference = "light" | "dark" | "system";
 
@@ -14,6 +15,7 @@ export interface Theme {
   space: typeof space;
   radius: typeof radius;
   motion: typeof motion;
+  elevation: typeof elevation;
   reducedMotion: boolean;
 }
 
@@ -27,6 +29,7 @@ function buildTheme(scheme: "light" | "dark", reducedMotion: boolean): Theme {
     space,
     radius,
     motion,
+    elevation,
     reducedMotion,
   };
 }
