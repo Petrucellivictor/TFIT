@@ -1,7 +1,8 @@
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import type { Goal, WeightTrendPoint } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { ScoreBar } from "@/components/ScoreBar";
 import { RadialGauge } from "@/components/RadialGauge";
@@ -14,6 +15,16 @@ const GOAL_TYPE_LABELS: Record<string, string> = {
   exercise_pr: "Recorde",
   custom: "Personalizada",
 };
+
+function computeWeightDelta(trend: WeightTrendPoint[]): { deltaKg: number; days: number } | null {
+  if (trend.length < 2) return null;
+  const latest = trend[trend.length - 1]!;
+  const earliest = trend[0]!;
+  const days = Math.round((new Date(latest.recordedAt).getTime() - new Date(earliest.recordedAt).getTime()) / 86400000);
+  if (days < 1) return null;
+  const deltaKg = Math.round((latest.weightKg - earliest.weightKg) * 10) / 10;
+  return { deltaKg, days };
+}
 
 export default function EvolutionScreen() {
   const theme = useTheme();
@@ -54,6 +65,9 @@ export default function EvolutionScreen() {
   }
 
   const { fitScore, weightTrend, recentPersonalRecords, activeGoals, currentStreakDays } = data;
+  const weightDelta = computeWeightDelta(weightTrend);
+  const latestWeight = weightTrend.length > 0 ? weightTrend[weightTrend.length - 1]!.weightKg : null;
+  const startWeight = weightTrend.length > 0 ? weightTrend[0]!.weightKg : null;
 
   return (
     <Screen>
@@ -87,11 +101,20 @@ export default function EvolutionScreen() {
         </Surface>
 
         <Surface level="raised" style={{ padding: theme.space.lg, gap: theme.space.sm }}>
-          <Stack direction="row" justify="space-between" align="center">
+          <Stack direction="row" justify="space-between" align="flex-end">
             <Text variant="headline">Peso</Text>
-            <Text color="secondary">
-              {weightTrend.length > 0 ? `${weightTrend[weightTrend.length - 1]!.weightKg} kg` : "—"}
-            </Text>
+            <Stack align="flex-end" gap="xxs">
+              <Text variant="bodyStrong">{latestWeight !== null ? `${latestWeight} kg` : "—"}</Text>
+              {weightDelta ? (
+                <Text
+                  variant="caption"
+                  style={{ color: weightDelta.deltaKg <= 0 ? theme.colors.feedback.success : theme.colors.feedback.warning }}
+                >
+                  {weightDelta.deltaKg === 0 ? "±" : weightDelta.deltaKg < 0 ? "↓" : "↑"} {Math.abs(weightDelta.deltaKg)} kg ·
+                  últimos {weightDelta.days} dias
+                </Text>
+              ) : null}
+            </Stack>
           </Stack>
           {weightTrend.length > 1 ? (
             <Sparkline values={weightTrend.map((w) => w.weightKg)} />
@@ -112,18 +135,9 @@ export default function EvolutionScreen() {
               Nenhuma meta ativa ainda.
             </Text>
           ) : (
-            <Stack gap="sm">
+            <Stack gap="md">
               {activeGoals.map((goal) => (
-                <Stack key={goal.id} direction="row" gap="sm" align="center">
-                  <Ionicons name="flag-outline" size={18} color={theme.colors.accent.primary} />
-                  <Stack style={{ flex: 1 }}>
-                    <Text variant="bodyStrong">{goal.title}</Text>
-                    <Text variant="caption" color="secondary">
-                      {GOAL_TYPE_LABELS[goal.goalType]}
-                      {goal.targetDate ? ` · até ${goal.targetDate}` : ""}
-                    </Text>
-                  </Stack>
-                </Stack>
+                <GoalCard key={goal.id} goal={goal} currentWeightKg={latestWeight} startWeightKg={startWeight} />
               ))}
             </Stack>
           )}
@@ -151,5 +165,76 @@ export default function EvolutionScreen() {
         </Surface>
       </ScrollView>
     </Screen>
+  );
+}
+
+function GoalCard({
+  goal,
+  currentWeightKg,
+  startWeightKg,
+}: {
+  goal: Goal;
+  currentWeightKg: number | null;
+  startWeightKg: number | null;
+}) {
+  const theme = useTheme();
+  const showsProgress =
+    goal.goalType === "weight_target" &&
+    goal.targetValue !== null &&
+    currentWeightKg !== null &&
+    startWeightKg !== null &&
+    startWeightKg !== goal.targetValue;
+
+  return (
+    <Stack gap="sm">
+      <Stack direction="row" gap="sm" align="center">
+        <Ionicons name="flag-outline" size={18} color={theme.colors.accent.primary} />
+        <Stack style={{ flex: 1 }}>
+          <Text variant="bodyStrong">{goal.title}</Text>
+          <Text variant="caption" color="secondary">
+            {GOAL_TYPE_LABELS[goal.goalType]}
+            {goal.targetDate ? ` · até ${goal.targetDate}` : ""}
+          </Text>
+        </Stack>
+        {showsProgress ? (
+          <Text variant="caption" color="secondary">
+            {currentWeightKg} → {goal.targetValue} kg
+          </Text>
+        ) : null}
+      </Stack>
+      {showsProgress ? (
+        <GoalProgressBar start={startWeightKg!} current={currentWeightKg!} target={goal.targetValue!} />
+      ) : null}
+    </Stack>
+  );
+}
+
+function GoalProgressBar({ start, current, target }: { start: number; current: number; target: number }) {
+  const theme = useTheme();
+  const percent = Math.min(100, Math.max(0, Math.round(((current - start) / (target - start)) * 100)));
+
+  return (
+    <Stack gap="xxs">
+      <View
+        style={{
+          height: 6,
+          borderRadius: theme.radius.pill,
+          backgroundColor: theme.colors.background.sunken,
+          overflow: "hidden",
+        }}
+      >
+        <View
+          style={{
+            height: "100%",
+            width: `${percent}%`,
+            borderRadius: theme.radius.pill,
+            backgroundColor: theme.colors.accent.primary,
+          }}
+        />
+      </View>
+      <Text variant="caption" color="secondary">
+        {percent}% da meta
+      </Text>
+    </Stack>
   );
 }

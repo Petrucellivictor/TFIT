@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, Pressable } from "react-native";
+import { ActivityIndicator, FlatList, LayoutAnimation, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import type { WorkoutDetail } from "@tfit/types";
 import { Screen } from "@/components/Screen";
+import { AIGenerationSequence } from "@/components/AIGenerationSequence";
+import { AISignal } from "@/components/AISignal";
 import { useGenerateWorkout, useWorkoutPlan } from "@/hooks/useWorkoutPlan";
 import { ApiRequestError } from "@/lib/api";
 
@@ -52,7 +54,7 @@ function GenerateEmptyState() {
       </Text>
       {generate.isPending ? (
         <Stack align="center" gap="sm">
-          <ActivityIndicator />
+          <AIGenerationSequence />
           <Text color="secondary" variant="caption" style={{ textAlign: "center" }}>
             Isso pode levar cerca de um minuto — estamos revisando segurança e qualidade do treino.
           </Text>
@@ -131,16 +133,29 @@ export default function TreinosScreen() {
             </Stack>
             {plan.reasoning ? (
               <>
-                <Pressable onPress={() => setShowReasoning((v) => !v)}>
-                  <Stack direction="row" gap="xxs" align="center">
-                    <Ionicons name="information-circle-outline" size={16} color={theme.colors.accent.primary} />
-                    <Text variant="label" color="primary" style={{ color: theme.colors.accent.primary }}>
-                      Por que esse treino?
+                <Pressable
+                  onPress={() => {
+                    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    setShowReasoning((v) => !v);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Por que esse treino?"
+                  accessibilityState={{ expanded: showReasoning }}
+                >
+                  <Stack direction="row" gap="xs" align="center">
+                    <AISignal size={5} />
+                    <Text variant="label" style={{ color: theme.colors.accent.primary }}>
+                      POR QUE ESSE TREINO?
                     </Text>
+                    <Ionicons
+                      name={showReasoning ? "chevron-up" : "chevron-down"}
+                      size={14}
+                      color={theme.colors.accent.primary}
+                    />
                   </Stack>
                 </Pressable>
                 {showReasoning ? (
-                  <Surface level="sunken" style={{ padding: theme.space.md }}>
+                  <Surface level="sunken" bordered style={{ padding: theme.space.md }}>
                     <Text color="secondary">{plan.reasoning}</Text>
                   </Surface>
                 ) : null}

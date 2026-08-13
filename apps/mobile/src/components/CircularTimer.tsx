@@ -9,11 +9,13 @@ export function CircularTimer({
   progress,
   size = 200,
   strokeWidth = 12,
+  strokeColor,
 }: {
   /** Remaining fraction, 1 (full) → 0 (empty). */
   progress: number;
   size?: number;
   strokeWidth?: number;
+  strokeColor?: string;
 }) {
   const theme = useTheme();
   const radius = (size - strokeWidth) / 2;
@@ -35,7 +37,7 @@ export function CircularTimer({
         cx={size / 2}
         cy={size / 2}
         r={radius}
-        stroke={theme.colors.accent.primary}
+        stroke={strokeColor ?? theme.colors.accent.primary}
         strokeWidth={strokeWidth}
         fill="none"
         strokeDasharray={circumference}

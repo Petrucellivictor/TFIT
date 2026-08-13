@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ScrollView } from "react-native";
+import Animated, { SlideInRight } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { Button, Stack, Text, TextField } from "@tfit/ui";
+import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
 import type {
   EquipmentPreference,
   ExperienceLevel,
@@ -56,6 +57,7 @@ const MINUTES_OPTIONS = [15, 30, 45, 60, 90];
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const submitOnboarding = useSubmitOnboarding();
 
   const [step, setStep] = useState(0);
@@ -130,7 +132,13 @@ export default function OnboardingScreen() {
 
     try {
       await submitOnboarding.mutateAsync(parsed.data);
-      router.replace("/(app)");
+      router.replace({
+        pathname: "/onboarding/generating",
+        params: {
+          goalLabel: GOAL_OPTIONS.find((o) => o.value === goal)?.label ?? "",
+          daysPerWeek: String(daysPerWeek),
+        },
+      });
     } catch {
       setSubmitError("Não conseguimos salvar suas respostas agora. Tente novamente.");
     }
@@ -147,7 +155,11 @@ export default function OnboardingScreen() {
         </Stack>
 
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-          <Stack gap="lg">
+          <Animated.View
+            key={step}
+            entering={theme.reducedMotion ? undefined : SlideInRight.duration(220)}
+            style={{ gap: theme.space.lg }}
+          >
             <Text variant="title">{ONBOARDING_STEPS[step]?.titlePtBr}</Text>
 
             {stepKey === "physical" && (
@@ -245,7 +257,7 @@ export default function OnboardingScreen() {
                 ))}
               </Stack>
             )}
-          </Stack>
+          </Animated.View>
         </ScrollView>
 
         {submitError ? <Text style={{ color: "#C0362C" }}>{submitError}</Text> : null}

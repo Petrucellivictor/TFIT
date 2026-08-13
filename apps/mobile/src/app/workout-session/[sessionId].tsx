@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import type { GamificationEventResult, SetFeedback, WorkoutDetail } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { Chip } from "@/components/Chip";
@@ -43,7 +43,10 @@ function buildTasks(workout: WorkoutDetail): SetTask[] {
 }
 
 export default function WorkoutSessionScreen() {
-  const { sessionId, workout: workoutParam } = useLocalSearchParams<{ sessionId: string; workout: string }>();
+  const { sessionId, workout: workoutParam } = useLocalSearchParams<{
+    sessionId: string;
+    workout: string;
+  }>();
   const workout = useMemo(() => JSON.parse(workoutParam) as WorkoutDetail, [workoutParam]);
   const tasks = useMemo(() => buildTasks(workout), [workout]);
 
@@ -59,9 +62,15 @@ export default function WorkoutSessionScreen() {
   const [feedback, setFeedback] = useState<SetFeedback | null>(null);
   const [setBanner, setSetBanner] = useState<GamificationEventResult | null>(null);
   const [completionResult, setCompletionResult] = useState<GamificationEventResult | null>(null);
+  const [totalXpEarned, setTotalXpEarned] = useState(0);
+  const [prCount, setPrCount] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
 
   const task = tasks[taskIndex];
+  const nextTask = tasks[taskIndex + 1];
   const isLastTask = taskIndex === tasks.length - 1;
+
+  const exerciseCount = new Set(workout.exercises.map((e) => e.id)).size;
 
   if (phase === "completed") {
     return (
@@ -69,12 +78,23 @@ export default function WorkoutSessionScreen() {
         <Stack align="center" justify="center" gap="lg" style={{ flex: 1, padding: 32 }}>
           <Ionicons name="checkmark-circle" size={56} color={theme.colors.accent.primary} />
           <Text variant="title" style={{ textAlign: "center" }}>
-            Treino concluído!
+            Treino concluído
           </Text>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Você completou {tasks.length} séries em {workout.name}.
-          </Text>
-          <Button label="Voltar" onPress={() => router.replace("/(app)/treinos")} />
+
+          <Surface level="raised" bordered style={{ padding: theme.space.lg, width: "100%" }}>
+            <Stack direction="row" style={{ flexWrap: "wrap" }} gap="lg">
+              {durationMinutes !== null ? <SummaryStat label="MINUTOS" value={String(durationMinutes)} /> : null}
+              <SummaryStat label="SÉRIES" value={String(tasks.length)} />
+              <SummaryStat label="EXERCÍCIOS" value={String(exerciseCount)} />
+              {totalXpEarned > 0 ? <SummaryStat label="XP GANHO" value={`+${totalXpEarned}`} /> : null}
+              {completionResult?.currentStreak ? (
+                <SummaryStat label="SEQUÊNCIA" value={`🔥 ${completionResult.currentStreak}`} />
+              ) : null}
+              {prCount > 0 ? <SummaryStat label="NOVOS RECORDES" value={String(prCount)} /> : null}
+            </Stack>
+          </Surface>
+
+          <Button label="Continuar" onPress={() => router.replace("/(app)/treinos")} />
         </Stack>
         <GamificationCelebration result={completionResult} onDismiss={() => setCompletionResult(null)} />
       </Screen>
@@ -87,17 +107,27 @@ export default function WorkoutSessionScreen() {
         <Stack align="center" justify="center" gap="lg" style={{ flex: 1, padding: 32 }}>
           <Ionicons name="checkmark-circle" size={56} color={theme.colors.accent.primary} />
           <Text variant="title" style={{ textAlign: "center" }}>
-            Treino concluído!
+            Última série concluída
           </Text>
           <Text color="secondary" style={{ textAlign: "center" }}>
             Você completou {tasks.length} séries em {workout.name}.
           </Text>
           <Button
-            label={completeSession.isPending ? "Salvando..." : "Concluir"}
+            label={completeSession.isPending ? "Salvando..." : "Concluir treino"}
             onPress={() =>
               completeSession.mutate(undefined, {
                 onSuccess: (res) => {
+                  setTotalXpEarned((xp) => xp + res.gamification.xpAwarded);
                   setCompletionResult(res.gamification);
+                  if (res.session.completedAt) {
+                    const minutes = Math.max(
+                      1,
+                      Math.round(
+                        (new Date(res.session.completedAt).getTime() - new Date(res.session.startedAt).getTime()) / 60000,
+                      ),
+                    );
+                    setDurationMinutes(minutes);
+                  }
                   setPhase("completed");
                 },
               })
@@ -114,6 +144,8 @@ export default function WorkoutSessionScreen() {
       <Screen>
         <RestTimer
           seconds={task.restSeconds}
+          nextExerciseName={nextTask?.exerciseName}
+          nextSetLabel={nextTask ? `${nextTask.repsMin}-${nextTask.repsMax} repetições` : undefined}
           onDone={() => {
             const next = taskIndex + 1;
             setTaskIndex(next);
@@ -141,6 +173,8 @@ export default function WorkoutSessionScreen() {
       },
       {
         onSuccess: (res) => {
+          setTotalXpEarned((xp) => xp + res.gamification.xpAwarded);
+          if (res.isNewPersonalRecord) setPrCount((c) => c + 1);
           if (res.isNewPersonalRecord || res.gamification.xpAwarded > 0 || res.gamification.newAchievements.length > 0) {
             setSetBanner(res.gamification);
           }
@@ -167,14 +201,34 @@ export default function WorkoutSessionScreen() {
           </Text>
         </Stack>
 
-        <Stack direction="row" gap="md">
-          <Stack style={{ flex: 1 }}>
-            <TextField label="Repetições" keyboardType="number-pad" value={reps} onChangeText={setReps} />
+        <Surface level="raised" bordered style={{ padding: theme.space.lg, gap: theme.space.md, alignItems: "center" }}>
+          <Text variant="label" color="secondary" style={{ letterSpacing: 0.6 }}>
+            REPETIÇÕES
+          </Text>
+          <TextField
+            keyboardType="number-pad"
+            value={reps}
+            onChangeText={setReps}
+            style={{
+              fontSize: 56,
+              fontWeight: "700",
+              textAlign: "center",
+              borderWidth: 0,
+              backgroundColor: "transparent",
+              color: theme.colors.accent.primary,
+              paddingVertical: 0,
+            }}
+          />
+          <Stack style={{ width: "60%" }}>
+            <TextField
+              label="Peso (kg, opcional)"
+              keyboardType="decimal-pad"
+              value={weight}
+              onChangeText={setWeight}
+              style={{ textAlign: "center" }}
+            />
           </Stack>
-          <Stack style={{ flex: 1 }}>
-            <TextField label="Peso (kg, opcional)" keyboardType="decimal-pad" value={weight} onChangeText={setWeight} />
-          </Stack>
-        </Stack>
+        </Surface>
 
         <Stack gap="sm">
           <Text variant="label" color="secondary">
@@ -202,5 +256,16 @@ export default function WorkoutSessionScreen() {
       </Stack>
       <GamificationCelebration result={setBanner} onDismiss={() => setSetBanner(null)} />
     </Screen>
+  );
+}
+
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <Stack gap="xxs" style={{ minWidth: "40%" }}>
+      <Text variant="title">{value}</Text>
+      <Text variant="label" color="secondary" style={{ letterSpacing: 0.6 }}>
+        {label}
+      </Text>
+    </Stack>
   );
 }

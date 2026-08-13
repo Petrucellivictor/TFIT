@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Stack, Text, useTheme } from "@tfit/ui";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { CircularTimer } from "./CircularTimer";
 
-export function RestTimer({ seconds, onDone }: { seconds: number; onDone: () => void }) {
+const EMPHASIS_THRESHOLD_SECONDS = 5;
+
+export interface RestTimerProps {
+  seconds: number;
+  onDone: () => void;
+  nextExerciseName?: string;
+  nextSetLabel?: string;
+}
+
+export function RestTimer({ seconds, onDone, nextExerciseName, nextSetLabel }: RestTimerProps) {
   const theme = useTheme();
   const [remaining, setRemaining] = useState(seconds);
+  const pulse = useSharedValue(1);
+  const isEmphasized = remaining <= EMPHASIS_THRESHOLD_SECONDS && remaining > 0;
 
   useEffect(() => {
     if (remaining <= 0) {
@@ -17,17 +29,52 @@ export function RestTimer({ seconds, onDone }: { seconds: number; onDone: () => 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: only re-run on remaining tick
   }, [remaining]);
 
+  useEffect(() => {
+    if (!isEmphasized || theme.reducedMotion) return;
+    pulse.value = withSequence(withTiming(1.15, { duration: 180 }), withTiming(1, { duration: 180 }));
+  }, [isEmphasized, remaining, pulse, theme.reducedMotion]);
+
+  const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
+  const ringColor = isEmphasized ? theme.colors.feedback.warning : undefined;
+
   return (
     <Stack align="center" gap="lg" style={{ flex: 1, justifyContent: "center", padding: 32 }}>
       <Text variant="label" color="secondary">
         DESCANSO
       </Text>
       <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <CircularTimer progress={seconds > 0 ? remaining / seconds : 0} size={200} strokeWidth={12} />
-        <Text style={{ position: "absolute", fontSize: 56, fontWeight: "700", color: theme.colors.accent.primary }}>
+        <CircularTimer progress={seconds > 0 ? remaining / seconds : 0} size={200} strokeWidth={12} strokeColor={ringColor} />
+        <Animated.Text
+          style={[
+            {
+              position: "absolute",
+              fontSize: 56,
+              fontWeight: "700",
+              color: isEmphasized ? theme.colors.feedback.warning : theme.colors.accent.primary,
+            },
+            pulseStyle,
+          ]}
+        >
           {remaining}s
-        </Text>
+        </Animated.Text>
       </View>
+
+      {nextExerciseName ? (
+        <Surface level="raised" bordered style={{ padding: theme.space.md, width: "100%" }}>
+          <Stack gap="xxs" align="center">
+            <Text variant="label" color="secondary" style={{ letterSpacing: 0.6 }}>
+              PRÓXIMA SÉRIE
+            </Text>
+            <Text variant="bodyStrong">{nextExerciseName}</Text>
+            {nextSetLabel ? (
+              <Text variant="caption" color="secondary">
+                {nextSetLabel}
+              </Text>
+            ) : null}
+          </Stack>
+        </Surface>
+      ) : null}
+
       <Button label="Pular descanso" variant="secondary" onPress={onDone} />
     </Stack>
   );
