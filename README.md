@@ -9,6 +9,7 @@ An AI personal-trainer, fitness-tracking, and fitness social network — mobile-
 - [`docs/AGENTS.md`](docs/AGENTS.md) — the 15-agent AI architecture and safety gate
 - [`docs/SKILLS.md`](docs/SKILLS.md) — knowledge skill catalog
 - [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) — visual identity, tokens, motion
+- [`docs/FUNC.md`](docs/FUNC.md) — full feature catalog by screen/flow (pt-BR), for design reference
 - [`docs/SECURITY.md`](docs/SECURITY.md) — auth, data classification, LGPD
 - [`docs/API.md`](docs/API.md) — endpoint conventions and domain map
 - [`docs/TESTING.md`](docs/TESTING.md) — test strategy
