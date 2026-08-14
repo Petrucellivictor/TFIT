@@ -1,9 +1,11 @@
-import { ActivityIndicator, FlatList, Pressable } from "react-native";
+import { FlatList, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import type { NotificationView } from "@tfit/types";
-import { Stack, Text, useTheme } from "@tfit/ui";
+import { EmptyState, ErrorState, Stack, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { NotificationRow } from "@/components/NotificationRow";
+import { UserRowSkeleton } from "@/components/UserRowSkeleton";
 import { useMarkNotificationsRead, useNotifications } from "@/hooks/useSocial";
 
 export default function NotificationsScreen() {
@@ -29,8 +31,20 @@ export default function NotificationsScreen() {
   if (notifications.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="xs" style={{ padding: 24 }}>
+          <UserRowSkeleton />
+          <UserRowSkeleton />
+          <UserRowSkeleton />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (notifications.isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar suas notificações agora." />
         </Stack>
       </Screen>
     );
@@ -58,9 +72,10 @@ export default function NotificationsScreen() {
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <Stack style={{ height: theme.space.xs }} />}
           ListEmptyComponent={
-            <Text color="secondary" style={{ textAlign: "center", marginTop: 32 }}>
-              Nenhuma notificação por enquanto.
-            </Text>
+            <EmptyState
+              icon={<Ionicons name="notifications-outline" size={32} color={theme.colors.text.secondary} />}
+              title="Nenhuma notificação por enquanto"
+            />
           }
           renderItem={({ item }) => <NotificationRow notification={item} onPress={() => openNotification(item)} />}
         />

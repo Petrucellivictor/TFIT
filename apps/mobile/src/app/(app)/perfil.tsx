@@ -1,8 +1,8 @@
-import { ActivityIndicator, Image, Pressable } from "react-native";
+import { Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useClerk } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Button, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useMe } from "@/hooks/useMe";
 
@@ -42,7 +42,15 @@ export default function PerfilScreen() {
     <Screen>
       <Stack gap="lg" style={{ flex: 1, padding: 24 }}>
         {me.isLoading ? (
-          <ActivityIndicator />
+          <Stack direction="row" gap="md" align="center">
+            <Skeleton width={64} height={64} radius="pill" />
+            <Stack gap="xxs" style={{ flex: 1 }}>
+              <Skeleton width="50%" height={18} />
+              <Skeleton width="35%" height={14} />
+            </Stack>
+          </Stack>
+        ) : me.isError ? (
+          <ErrorState message="Não conseguimos carregar seu perfil agora." />
         ) : (
           <Stack direction="row" gap="md" align="center">
             {me.data?.profile.avatarUrl ? (

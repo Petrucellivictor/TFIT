@@ -1,8 +1,10 @@
-import { ActivityIndicator, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import { useRouter } from "expo-router";
-import { Button, Stack, Text, useTheme } from "@tfit/ui";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, EmptyState, ErrorState, Stack, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { UserRow } from "@/components/UserRow";
+import { UserRowSkeleton } from "@/components/UserRowSkeleton";
 import { useAcceptFollowRequest, useFollowRequests, useRejectFollowRequest } from "@/hooks/useSocial";
 
 export default function FollowRequestsScreen() {
@@ -15,8 +17,19 @@ export default function FollowRequestsScreen() {
   if (requests.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="xs" style={{ padding: 24 }}>
+          <UserRowSkeleton />
+          <UserRowSkeleton />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (requests.isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar as solicitações agora." />
         </Stack>
       </Screen>
     );
@@ -31,9 +44,10 @@ export default function FollowRequestsScreen() {
           keyExtractor={(item) => item.userId}
           ItemSeparatorComponent={() => <Stack style={{ height: theme.space.xxs }} />}
           ListEmptyComponent={
-            <Text color="secondary" style={{ textAlign: "center", marginTop: 32 }}>
-              Nenhuma solicitação pendente.
-            </Text>
+            <EmptyState
+              icon={<Ionicons name="person-add-outline" size={32} color={theme.colors.text.secondary} />}
+              title="Nenhuma solicitação pendente"
+            />
           }
           renderItem={({ item }) => (
             <UserRow

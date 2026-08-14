@@ -2,30 +2,15 @@ import { useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Badge, EmptyState, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Badge, EmptyState, ErrorState, Stack, Text, useTheme } from "@tfit/ui";
 import type { PostSummary } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { PostCard } from "@/components/PostCard";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { PostActionSheet } from "@/components/PostActionSheet";
 import { ReportModal } from "@/components/ReportModal";
 import { useMe } from "@/hooks/useMe";
 import { useBlockUser, useDeletePost, useFeed, useNotifications, useReportContent, useToggleLike } from "@/hooks/useSocial";
-
-function PostCardSkeleton() {
-  const theme = useTheme();
-  return (
-    <Surface level="raised" style={{ padding: theme.space.md, gap: theme.space.sm }}>
-      <Stack direction="row" gap="sm" align="center">
-        <Skeleton width={40} height={40} radius="pill" />
-        <Stack gap="xxs" style={{ flex: 1 }}>
-          <Skeleton width="50%" height={14} />
-          <Skeleton width="30%" height={11} />
-        </Stack>
-      </Stack>
-      <Skeleton height={220} radius="soft" />
-    </Surface>
-  );
-}
 
 export default function FeedScreen() {
   const theme = useTheme();

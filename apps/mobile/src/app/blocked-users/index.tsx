@@ -1,7 +1,9 @@
-import { ActivityIndicator, FlatList } from "react-native";
-import { Button, Stack, Text, useTheme } from "@tfit/ui";
+import { FlatList } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, EmptyState, ErrorState, Stack, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { UserRow } from "@/components/UserRow";
+import { UserRowSkeleton } from "@/components/UserRowSkeleton";
 import { useBlockedUsers, useUnblockUser } from "@/hooks/useSocial";
 
 export default function BlockedUsersScreen() {
@@ -12,8 +14,19 @@ export default function BlockedUsersScreen() {
   if (blockedUsers.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="xs" style={{ padding: 24 }}>
+          <UserRowSkeleton />
+          <UserRowSkeleton />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (blockedUsers.isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar essa lista agora." />
         </Stack>
       </Screen>
     );
@@ -28,9 +41,10 @@ export default function BlockedUsersScreen() {
           keyExtractor={(item) => item.userId}
           ItemSeparatorComponent={() => <Stack style={{ height: theme.space.xxs }} />}
           ListEmptyComponent={
-            <Text color="secondary" style={{ textAlign: "center", marginTop: 32 }}>
-              Você não bloqueou ninguém.
-            </Text>
+            <EmptyState
+              icon={<Ionicons name="shield-checkmark-outline" size={32} color={theme.colors.text.secondary} />}
+              title="Você não bloqueou ninguém"
+            />
           }
           renderItem={({ item }) => (
             <UserRow

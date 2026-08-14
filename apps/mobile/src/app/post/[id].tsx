@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, View } from "react-native";
+import { FlatList, KeyboardAvoidingView, Platform, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, EmptyState, ErrorState, Stack, TextField, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { PostCard } from "@/components/PostCard";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { CommentRow } from "@/components/CommentRow";
+import { UserRowSkeleton } from "@/components/UserRowSkeleton";
 import { PostActionSheet } from "@/components/PostActionSheet";
 import { ReportModal } from "@/components/ReportModal";
 import { useMe } from "@/hooks/useMe";
@@ -30,8 +33,8 @@ export default function PostDetailScreen() {
   if (post.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack style={{ padding: 24 }}>
+          <PostCardSkeleton />
         </Stack>
       </Screen>
     );
@@ -40,10 +43,8 @@ export default function PostDetailScreen() {
   if (post.isError || !post.data) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1, padding: 32 }}>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Não conseguimos encontrar esse post.
-          </Text>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos encontrar esse post." />
         </Stack>
       </Screen>
     );
@@ -79,11 +80,15 @@ export default function PostDetailScreen() {
           }
           ListEmptyComponent={
             comments.isLoading ? (
-              <ActivityIndicator />
+              <Stack gap="md">
+                <UserRowSkeleton />
+                <UserRowSkeleton />
+              </Stack>
             ) : (
-              <Text color="secondary" style={{ textAlign: "center" }}>
-                Seja o primeiro a comentar.
-              </Text>
+              <EmptyState
+                icon={<Ionicons name="chatbubble-outline" size={32} color={theme.colors.text.secondary} />}
+                title="Seja o primeiro a comentar"
+              />
             )
           }
           renderItem={({ item: comment }) => <CommentRow comment={comment} />}

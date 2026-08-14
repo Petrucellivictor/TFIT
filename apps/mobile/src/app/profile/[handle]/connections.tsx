@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList } from "react-native";
+import { FlatList } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Stack, Text, useTheme } from "@tfit/ui";
+import { EmptyState, ErrorState, Stack, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { Chip } from "@/components/Chip";
 import { UserRow } from "@/components/UserRow";
+import { UserRowSkeleton } from "@/components/UserRowSkeleton";
 import { useFollowers, useFollowing } from "@/hooks/useSocial";
 
 export default function ConnectionsScreen() {
@@ -28,8 +30,14 @@ export default function ConnectionsScreen() {
         </Stack>
 
         {query.isLoading ? (
-          <Stack align="center" justify="center" style={{ flex: 1 }}>
-            <ActivityIndicator />
+          <Stack gap="xs">
+            <UserRowSkeleton />
+            <UserRowSkeleton />
+            <UserRowSkeleton />
+          </Stack>
+        ) : query.isError ? (
+          <Stack style={{ flex: 1 }} justify="center">
+            <ErrorState message="Não conseguimos carregar essa lista agora." />
           </Stack>
         ) : (
           <FlatList
@@ -37,9 +45,10 @@ export default function ConnectionsScreen() {
             keyExtractor={(item) => item.userId}
             ItemSeparatorComponent={() => <Stack style={{ height: theme.space.xxs }} />}
             ListEmptyComponent={
-              <Text color="secondary" style={{ textAlign: "center", marginTop: 32 }}>
-                Ninguém por aqui ainda.
-              </Text>
+              <EmptyState
+                icon={<Ionicons name="people-outline" size={32} color={theme.colors.text.secondary} />}
+                title="Ninguém por aqui ainda"
+              />
             }
             renderItem={({ item }) => (
               <UserRow user={item} onPress={() => router.push({ pathname: "/profile/[handle]", params: { handle: item.handle } })} />

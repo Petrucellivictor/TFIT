@@ -14,6 +14,13 @@ const POST_TYPE_LABEL: Partial<Record<PostSummary["type"], string>> = {
   streak: "Sequência em dia",
 };
 
+const POST_TYPE_ICON: Partial<Record<PostSummary["type"], keyof typeof Ionicons.glyphMap>> = {
+  workout: "barbell",
+  achievement: "ribbon",
+  personal_record: "trophy",
+  streak: "flame",
+};
+
 function LikeButton({ liked, count, onToggle }: { liked: boolean; count: number; onToggle: () => void }) {
   const theme = useTheme();
   const scale = useSharedValue(1);
@@ -103,7 +110,7 @@ export function PostCard({
 
         {typeLabel ? (
           <Stack direction="row" gap="xs" align="center">
-            <Ionicons name="sparkles" size={14} color={theme.colors.accent.primary} />
+            <Ionicons name={POST_TYPE_ICON[post.type] ?? "sparkles"} size={14} color={theme.colors.accent.primary} />
             <Text variant="label" style={{ color: theme.colors.accent.primary }}>
               {typeLabel.toUpperCase()}
             </Text>

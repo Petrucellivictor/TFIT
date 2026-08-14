@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, View } from "react-native";
+import { FlatList, Pressable, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Text, useTheme } from "@tfit/ui";
+import { Button, EmptyState, ErrorState, Skeleton, Stack, Text, useTheme } from "@tfit/ui";
 import type { PostSummary } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { Avatar } from "@/components/Avatar";
@@ -30,8 +30,19 @@ export default function ProfileScreen() {
   if (profile.isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="lg" style={{ padding: 24 }}>
+          <Stack direction="row" gap="md" align="center">
+            <Skeleton width={72} height={72} radius="pill" />
+            <Stack gap="xxs" style={{ flex: 1 }}>
+              <Skeleton width="50%" height={18} />
+              <Skeleton width="35%" height={14} />
+            </Stack>
+          </Stack>
+          <Stack direction="row" gap="md">
+            <Skeleton style={{ flex: 1 }} height={110} />
+            <Skeleton style={{ flex: 1 }} height={110} />
+            <Skeleton style={{ flex: 1 }} height={110} />
+          </Stack>
         </Stack>
       </Screen>
     );
@@ -40,10 +51,8 @@ export default function ProfileScreen() {
   if (profile.isError || !profile.data) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1, padding: 32 }}>
-          <Text color="secondary" style={{ textAlign: "center" }}>
-            Não conseguimos carregar esse perfil agora.
-          </Text>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar esse perfil agora." />
         </Stack>
       </Screen>
     );
@@ -52,6 +61,7 @@ export default function ProfileScreen() {
   const { profile: person } = profile.data;
   const isSelf = person.followStatus === "self" || person.userId === me.data?.profile.userId;
   const posts = userPosts.data?.posts ?? [];
+  const isPrivateLocked = person.isPrivate && person.followStatus !== "accepted" && !isSelf;
 
   const followAction = () => {
     if (person.followStatus === "none") followUser.mutate(person.userId);
@@ -140,13 +150,18 @@ export default function ProfileScreen() {
           </Stack>
         }
         ListEmptyComponent={
-          <Stack align="center" justify="center" style={{ paddingTop: 32 }}>
-            <Text color="secondary">
-              {person.isPrivate && person.followStatus !== "accepted" && !isSelf
-                ? "Esta conta é privada. Siga para ver os posts."
-                : "Nenhum post ainda."}
-            </Text>
-          </Stack>
+          isPrivateLocked ? (
+            <EmptyState
+              icon={<Ionicons name="lock-closed-outline" size={32} color={theme.colors.text.secondary} />}
+              title="Esta conta é privada"
+              description="Siga para ver os posts."
+            />
+          ) : (
+            <EmptyState
+              icon={<Ionicons name="images-outline" size={32} color={theme.colors.text.secondary} />}
+              title="Nenhum post ainda"
+            />
+          )
         }
         renderItem={({ item }: { item: PostSummary }) => {
           const thumb = item.mediaUrls[0];
