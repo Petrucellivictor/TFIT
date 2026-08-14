@@ -1,6 +1,7 @@
 import { ActivityIndicator, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter, Stack as RouterStack } from "expo-router";
-import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, IconButton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
 import { useWorkoutPlanDetail } from "@/hooks/useWorkoutPlans";
@@ -45,9 +46,18 @@ export default function WorkoutDetailScreen() {
         <Stack gap="sm">
           {workout.exercises.map((item, index) => (
             <Surface key={item.id} level="raised" style={{ padding: theme.space.md, gap: theme.space.xxs }}>
-              <Text variant="label" color="secondary">
-                {index + 1}. {item.exercise.primaryMuscle} · {item.exercise.equipment}
-              </Text>
+              <Stack direction="row" align="center" justify="space-between">
+                <Text variant="label" color="secondary">
+                  {index + 1}. {item.exercise.primaryMuscle} · {item.exercise.equipment}
+                </Text>
+                <IconButton
+                  icon={<Ionicons name="information-circle-outline" size={20} color={theme.colors.text.secondary} />}
+                  accessibilityLabel={`Ver detalhes de ${item.exercise.name}`}
+                  onPress={() =>
+                    router.push({ pathname: "/exercise/[id]", params: { id: item.exercise.id } })
+                  }
+                />
+              </Stack>
               <Text variant="bodyStrong">{item.exercise.name}</Text>
               <Text color="secondary">
                 {item.sets} séries de {item.repsMin}-{item.repsMax} reps · {item.restSeconds}s de descanso

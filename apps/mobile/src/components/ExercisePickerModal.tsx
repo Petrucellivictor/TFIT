@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ActivityIndicator, FlatList, Modal, Pressable } from "react-native";
-import { Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { IconButton, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import { useExercises, type ExerciseListItem } from "@/hooks/useExercises";
 
 const MUSCLE_OPTIONS = [
@@ -28,9 +30,15 @@ export function ExercisePickerModal({
   onSelect: (exercise: ExerciseListItem) => void;
 }) {
   const theme = useTheme();
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [muscle, setMuscle] = useState<string | undefined>(undefined);
   const { data, isLoading } = useExercises(search, muscle);
+
+  const openDetail = (exerciseId: string) => {
+    onClose();
+    router.push({ pathname: "/exercise/[id]", params: { id: exerciseId } });
+  };
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
@@ -85,10 +93,19 @@ export function ExercisePickerModal({
               renderItem={({ item }) => (
                 <Pressable onPress={() => onSelect(item)}>
                   <Surface level="raised" style={{ padding: theme.space.sm }}>
-                    <Text variant="bodyStrong">{item.name}</Text>
-                    <Text variant="caption" color="secondary">
-                      {item.primaryMuscle} · {item.equipment} · {item.level}
-                    </Text>
+                    <Stack direction="row" align="center" gap="sm">
+                      <Stack style={{ flex: 1 }}>
+                        <Text variant="bodyStrong">{item.name}</Text>
+                        <Text variant="caption" color="secondary">
+                          {item.primaryMuscle} · {item.equipment} · {item.level}
+                        </Text>
+                      </Stack>
+                      <IconButton
+                        icon={<Ionicons name="information-circle-outline" size={22} color={theme.colors.text.secondary} />}
+                        accessibilityLabel={`Ver detalhes de ${item.name}`}
+                        onPress={() => openDetail(item.id)}
+                      />
+                    </Stack>
                   </Surface>
                 </Pressable>
               )}

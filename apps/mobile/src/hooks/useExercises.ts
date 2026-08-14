@@ -9,6 +9,7 @@ export interface ExerciseListItem {
   primaryMuscle: string;
   equipment: string;
   level: string;
+  hasAnimation: boolean;
 }
 
 export function useExercises(search: string, muscle?: string) {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, IconButton, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import type { GamificationEventResult, SetFeedback, WorkoutDetail } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { Chip } from "@/components/Chip";
@@ -14,6 +14,7 @@ interface SetTask {
   setNumber: number;
   totalSets: number;
   workoutExerciseId: string;
+  exerciseId: string;
   exerciseName: string;
   repsMin: number;
   repsMax: number;
@@ -34,6 +35,7 @@ function buildTasks(workout: WorkoutDetail): SetTask[] {
       setNumber: i + 1,
       totalSets: item.sets,
       workoutExerciseId: item.id,
+      exerciseId: item.exercise.id,
       exerciseName: item.exercise.name,
       repsMin: item.repsMin,
       repsMax: item.repsMax,
@@ -202,7 +204,16 @@ export default function WorkoutSessionScreen() {
           <Text variant="label" color="secondary">
             SÉRIE {task.setNumber} DE {task.totalSets}
           </Text>
-          <Text variant="title">{task.exerciseName}</Text>
+          <Stack direction="row" align="center" gap="xs">
+            <Text variant="title" style={{ flex: 1 }}>
+              {task.exerciseName}
+            </Text>
+            <IconButton
+              icon={<Ionicons name="information-circle-outline" size={22} color={theme.colors.text.secondary} />}
+              accessibilityLabel={`Ver detalhes de ${task.exerciseName}`}
+              onPress={() => router.push({ pathname: "/exercise/[id]", params: { id: task.exerciseId } })}
+            />
+          </Stack>
           <Text color="secondary">
             Alvo: {task.repsMin}-{task.repsMax} repetições
           </Text>

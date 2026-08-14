@@ -1,5 +1,5 @@
-import { and, eq, ilike } from "drizzle-orm";
-import { getDb, exerciseLibrary, muscleGroupEnum } from "@tfit/database";
+import { and, eq, ilike, sql } from "drizzle-orm";
+import { getDb, exerciseLibrary, exerciseAnimations, muscleGroupEnum } from "@tfit/database";
 import { jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
 
@@ -29,6 +29,7 @@ export async function GET(req: Request) {
       primaryMuscle: exerciseLibrary.primaryMuscle,
       equipment: exerciseLibrary.equipment,
       level: exerciseLibrary.level,
+      hasAnimation: sql<boolean>`exists (select 1 from ${exerciseAnimations} where ${exerciseAnimations.exerciseId} = ${exerciseLibrary.id})`,
     })
     .from(exerciseLibrary)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
