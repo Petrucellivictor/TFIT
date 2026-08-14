@@ -30,7 +30,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   let xpAwarded = 0;
   if (parsed.data.status === "achieved" && existing.status !== "achieved") {
-    xpAwarded = await awardXp(result.user.id, "goal_achieved", id);
+    xpAwarded = (await awardXp(result.user.id, "goal_achieved", id)).amount;
   }
 
   return jsonOk({ goal, gamification: { xpAwarded } });

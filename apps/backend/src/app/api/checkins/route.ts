@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     })
     .returning();
 
-  const [xpAwarded, streakResult] = await Promise.all([
+  const [xpResult, streakResult] = await Promise.all([
     awardXp(result.user.id, "checkin", checkin!.id),
     recordStreakActivity(result.user.id),
   ]);
@@ -49,7 +49,14 @@ export async function POST(req: Request) {
   return jsonOk(
     {
       checkin,
-      gamification: { xpAwarded, streakEvent: streakResult.event, currentStreak: streakResult.currentStreak, newAchievements },
+      gamification: {
+        xpAwarded: xpResult.amount,
+        streakEvent: streakResult.event,
+        currentStreak: streakResult.currentStreak,
+        newAchievements,
+        leveledUp: xpResult.leveledUp,
+        newLevel: xpResult.newLevel ?? undefined,
+      },
     },
     201,
   );

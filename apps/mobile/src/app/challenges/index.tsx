@@ -1,6 +1,6 @@
-import { ActivityIndicator, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Button, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import type { ChallengeView } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { ScoreBar } from "@/components/ScoreBar";
@@ -44,13 +44,20 @@ function ChallengeCard({ challenge }: { challenge: ChallengeView }) {
 
 export default function ChallengesScreen() {
   const theme = useTheme();
-  const { data, isLoading } = useChallenges();
+  const { data, isLoading, isError } = useChallenges();
 
   return (
     <Screen>
       {isLoading ? (
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="md" style={{ padding: 24 }}>
+          <Skeleton width="30%" height={28} />
+          <Skeleton height={110} />
+          <Skeleton height={110} />
+          <Skeleton height={110} />
+        </Stack>
+      ) : isError ? (
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar os desafios agora." />
         </Stack>
       ) : (
         <FlatList

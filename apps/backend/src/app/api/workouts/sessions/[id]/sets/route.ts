@@ -59,6 +59,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   let isNewPersonalRecord = false;
   let xpAwarded = 0;
+  let leveledUp = false;
+  let newLevel: Awaited<ReturnType<typeof awardXp>>["newLevel"] = null;
   let newAchievements: Awaited<ReturnType<typeof checkAndUnlockAchievements>> = [];
 
   if (parsed.data.weightKg !== undefined) {
@@ -83,10 +85,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         })
         .returning();
       isNewPersonalRecord = true;
-      xpAwarded = await awardXp(user.id, "personal_record", newRecord!.id);
+      const xpResult = await awardXp(user.id, "personal_record", newRecord!.id);
+      xpAwarded = xpResult.amount;
+      leveledUp = xpResult.leveledUp;
+      newLevel = xpResult.newLevel;
       newAchievements = await checkAndUnlockAchievements(user.id);
     }
   }
 
-  return jsonOk({ set, isNewPersonalRecord, gamification: { xpAwarded, newAchievements } }, 201);
+  return jsonOk(
+    { set, isNewPersonalRecord, gamification: { xpAwarded, newAchievements, leveledUp, newLevel: newLevel ?? undefined } },
+    201,
+  );
 }

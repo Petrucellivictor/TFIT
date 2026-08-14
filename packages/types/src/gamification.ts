@@ -26,11 +26,18 @@ export interface AchievementView {
 
 export type StreakEvent = "already_recorded" | "started" | "continued" | "continued_with_freeze" | "reset";
 
+export interface LevelUpInfo {
+  level: number;
+  name: string;
+}
+
 export interface GamificationEventResult {
   xpAwarded: number;
   streakEvent?: StreakEvent;
   currentStreak?: number;
   newAchievements: AchievementView[];
+  leveledUp?: boolean;
+  newLevel?: LevelUpInfo;
 }
 
 export type ChallengeType = "workouts_count" | "cardio_minutes" | "streak_days" | "custom";

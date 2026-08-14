@@ -60,7 +60,9 @@ export default function WorkoutSessionScreen() {
   const [reps, setReps] = useState(String(tasks[0]?.repsMax ?? ""));
   const [weight, setWeight] = useState("");
   const [feedback, setFeedback] = useState<SetFeedback | null>(null);
-  const [setBanner, setSetBanner] = useState<GamificationEventResult | null>(null);
+  const [setBanner, setSetBanner] = useState<{ result: GamificationEventResult; isNewPersonalRecord: boolean } | null>(
+    null,
+  );
   const [completionResult, setCompletionResult] = useState<GamificationEventResult | null>(null);
   const [totalXpEarned, setTotalXpEarned] = useState(0);
   const [prCount, setPrCount] = useState(0);
@@ -175,8 +177,13 @@ export default function WorkoutSessionScreen() {
         onSuccess: (res) => {
           setTotalXpEarned((xp) => xp + res.gamification.xpAwarded);
           if (res.isNewPersonalRecord) setPrCount((c) => c + 1);
-          if (res.isNewPersonalRecord || res.gamification.xpAwarded > 0 || res.gamification.newAchievements.length > 0) {
-            setSetBanner(res.gamification);
+          if (
+            res.isNewPersonalRecord ||
+            res.gamification.xpAwarded > 0 ||
+            res.gamification.newAchievements.length > 0 ||
+            res.gamification.leveledUp
+          ) {
+            setSetBanner({ result: res.gamification, isNewPersonalRecord: res.isNewPersonalRecord });
           }
           if (isLastTask) {
             setPhase("summary");
@@ -254,7 +261,11 @@ export default function WorkoutSessionScreen() {
           disabled={logSet.isPending || reps.length === 0}
         />
       </Stack>
-      <GamificationCelebration result={setBanner} onDismiss={() => setSetBanner(null)} />
+      <GamificationCelebration
+        result={setBanner?.result}
+        isNewPersonalRecord={setBanner?.isNewPersonalRecord}
+        onDismiss={() => setSetBanner(null)}
+      />
     </Screen>
   );
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Modal, Pressable } from "react-native";
+import { FlatList, Modal, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
-import { Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import type { AchievementView } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import { useAchievements } from "@/hooks/useGamification";
@@ -135,14 +135,26 @@ function AchievementDetailModal({ achievement, onClose }: { achievement: Achieve
 
 export default function AchievementsScreen() {
   const theme = useTheme();
-  const { data, isLoading } = useAchievements();
+  const { data, isLoading, isError } = useAchievements();
   const [selected, setSelected] = useState<AchievementView | null>(null);
 
   return (
     <Screen>
       {isLoading ? (
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="md" style={{ padding: 24 }}>
+          <Skeleton width="40%" height={28} />
+          <Stack direction="row" gap="md">
+            <Skeleton style={{ flex: 1 }} height={140} />
+            <Skeleton style={{ flex: 1 }} height={140} />
+          </Stack>
+          <Stack direction="row" gap="md">
+            <Skeleton style={{ flex: 1 }} height={140} />
+            <Skeleton style={{ flex: 1 }} height={140} />
+          </Stack>
+        </Stack>
+      ) : isError ? (
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar suas conquistas agora." />
         </Stack>
       ) : (
         <FlatList

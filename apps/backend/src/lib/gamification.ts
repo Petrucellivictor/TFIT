@@ -16,15 +16,25 @@ import {
   MAX_XP_PER_DAY,
   recordActivity,
   findNewlyUnlockedAchievements,
+  getLevelProgress,
   type XpReason,
   type StreakState,
   type StreakEvent,
 } from "@tfit/gamification";
+import type { LevelUpInfo } from "@tfit/types";
 import { notifyUser } from "./social";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
+
+export interface XpAwardResult {
+  amount: number;
+  leveledUp: boolean;
+  newLevel: LevelUpInfo | null;
+}
+
+const NO_AWARD: XpAwardResult = { amount: 0, leveledUp: false, newLevel: null };
 
 /**
  * Awards XP for a specific event, deduped by (userId, reason, referenceId)
@@ -32,7 +42,7 @@ function todayISO(): string {
  * (packages/gamification MAX_XP_PER_DAY). Best-effort: gamification must
  * never break the primary action it's attached to.
  */
-export async function awardXp(userId: string, reason: XpReason, referenceId: string): Promise<number> {
+export async function awardXp(userId: string, reason: XpReason, referenceId: string): Promise<XpAwardResult> {
   try {
     const db = getDb();
     const startOfDay = new Date();
@@ -44,7 +54,12 @@ export async function awardXp(userId: string, reason: XpReason, referenceId: str
       .where(and(eq(xpTransactions.userId, userId), gte(xpTransactions.createdAt, startOfDay)));
 
     const amount = Math.max(0, Math.min(XP_AWARDS[reason], MAX_XP_PER_DAY - total));
-    if (amount === 0) return 0;
+    if (amount === 0) return NO_AWARD;
+
+    const [{ totalXp: totalBefore }] = await db
+      .select({ totalXp: sql<number>`coalesce(sum(${xpTransactions.amount}), 0)::int` })
+      .from(xpTransactions)
+      .where(eq(xpTransactions.userId, userId));
 
     const [inserted] = await db
       .insert(xpTransactions)
@@ -52,10 +67,16 @@ export async function awardXp(userId: string, reason: XpReason, referenceId: str
       .onConflictDoNothing({ target: [xpTransactions.userId, xpTransactions.reason, xpTransactions.referenceId] })
       .returning();
 
-    return inserted ? amount : 0;
+    if (!inserted) return NO_AWARD;
+
+    const levelBefore = getLevelProgress(totalBefore).level;
+    const progressAfter = getLevelProgress(totalBefore + amount);
+    const leveledUp = progressAfter.level > levelBefore;
+
+    return { amount, leveledUp, newLevel: leveledUp ? { level: progressAfter.level, name: progressAfter.name } : null };
   } catch (error) {
     console.error("awardXp failed", { userId, reason, referenceId, error });
-    return 0;
+    return NO_AWARD;
   }
 }
 

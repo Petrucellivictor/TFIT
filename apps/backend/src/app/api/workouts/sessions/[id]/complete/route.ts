@@ -24,7 +24,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     .where(eq(workoutSessions.id, session.id))
     .returning();
 
-  const [xpAwarded, streakResult] = await Promise.all([
+  const [xpResult, streakResult] = await Promise.all([
     awardXp(user.id, "workout_completed", session.id),
     recordStreakActivity(user.id),
   ]);
@@ -33,6 +33,13 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   return jsonOk({
     session: updated,
-    gamification: { xpAwarded, streakEvent: streakResult.event, currentStreak: streakResult.currentStreak, newAchievements },
+    gamification: {
+      xpAwarded: xpResult.amount,
+      streakEvent: streakResult.event,
+      currentStreak: streakResult.currentStreak,
+      newAchievements,
+      leveledUp: xpResult.leveledUp,
+      newLevel: xpResult.newLevel ?? undefined,
+    },
   });
 }

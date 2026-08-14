@@ -136,8 +136,10 @@ Fluxo linear, série por série:
 - Se não participando: botão "Participar".
 
 ### 8.3 Sistema de XP/nível (transversal)
-- Ganho de XP aparece em modais de celebração após: completar série (com recorde), completar treino, fazer check-in — sempre que há XP ou conquista nova.
-- Sequência (streak) com mecanismo de "congelar" (proteção) exibido no perfil de gamificação.
+- Ganho de XP aparece em modais de celebração após: completar série (com recorde), completar treino, fazer check-in — sempre que há XP, conquista nova ou nível alcançado.
+- **Subida de nível**: quando o XP ganho cruza o limiar do próximo nível, o modal de celebração mostra um destaque distinto — número do novo nível dentro de um anel com gradiente, nome do nível, acima de qualquer XP/conquista da mesma ação.
+- **Recorde pessoal**: ao bater um recorde, o modal de celebração mostra um rótulo distinto ("Novo recorde pessoal") junto ao XP ganho, além do contador de recordes no resumo pós-treino.
+- Sequência (streak) com mecanismo de "congelar" (proteção): o card de gamificação na Home mostra quantas proteções de sequência (freezes) o usuário tem disponíveis, ao lado do contador de dias.
 
 ---
 

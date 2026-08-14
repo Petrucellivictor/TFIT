@@ -107,12 +107,22 @@ function GamificationSummary() {
             </Text>
           </Stack>
           {streak.current > 0 ? (
-            <Surface level="sunken" radius="pill" style={{ paddingVertical: theme.space.xxs, paddingHorizontal: theme.space.sm }}>
-              <Stack direction="row" gap="xxs" align="center">
-                <Text>🔥</Text>
-                <Text variant="bodyStrong">{streak.current}</Text>
-              </Stack>
-            </Surface>
+            <Stack align="center" gap="xxs">
+              <Surface level="sunken" radius="pill" style={{ paddingVertical: theme.space.xxs, paddingHorizontal: theme.space.sm }}>
+                <Stack direction="row" gap="xxs" align="center">
+                  <Text>🔥</Text>
+                  <Text variant="bodyStrong">{streak.current}</Text>
+                </Stack>
+              </Surface>
+              {streak.freezesAvailable > 0 ? (
+                <Stack direction="row" gap="xxs" align="center">
+                  <Ionicons name="snow-outline" size={12} color={theme.colors.text.secondary} />
+                  <Text variant="caption" color="secondary">
+                    {streak.freezesAvailable}
+                  </Text>
+                </Stack>
+              ) : null}
+            </Stack>
           ) : null}
         </Stack>
       </Surface>
