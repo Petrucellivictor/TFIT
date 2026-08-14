@@ -2,6 +2,7 @@ import { ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
+import { Exercise3DViewer } from "@/components/Exercise3DViewer";
 import { useExerciseDetail } from "@/hooks/useExerciseDetail";
 
 const MUSCLE_LABEL: Record<string, string> = {
@@ -67,12 +68,9 @@ export default function ExerciseDetailScreen() {
           </Text>
         </Stack>
 
-        {/*
-          Phase 2 (gated on the 3D rendering spike) adds an Exercise3DViewer
-          here, above these text sections, whenever exercise.animation is
-          non-null. Until then — and permanently for exercises that never
-          get an animation — the text sections below are the whole screen.
-        */}
+        {exercise.animation ? (
+          <Exercise3DViewer animationUrl={exercise.animation.url} exerciseName={exercise.name} />
+        ) : null}
 
         <Surface level="raised" style={{ padding: theme.space.md }}>
           <Text color="secondary">{exercise.description}</Text>
