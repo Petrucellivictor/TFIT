@@ -245,7 +245,7 @@ Menu (modal deslizando de baixo) com 3 opções: **Iniciar treino**, **Check-in 
 
 ## 14. Sistema visual atual (resumo para referência de design)
 
-- **Identidade**: "Performance Tech" — visual escuro como principal (quase preto), inspirado em wearables de saúde (Whoop/Oura), com gradiente de destaque verde-elétrico → azul usado em botões, barras de progresso, gauges e badges.
+- **Identidade**: "TFIT Gold" — visual escuro como principal (preto/quase preto), alinhado à logo oficial da marca, com gradiente de destaque dourado (e branco como cor secundária) usado em botões, barras de progresso, gauges e badges.
 - **Cores** (`packages/ui/src/tokens/colors.ts`): tokens semânticos com versão clara e escura — fundo (base/elevado/rebaixado), texto (primário/secundário/inverso/desabilitado), bordas, cor de destaque (primária + secundária, usadas juntas em gradiente), feedback (sucesso/aviso/erro).
 - **Tipografia**: escala com 7 variantes (display, title, headline, body, bodyStrong, caption, label).
 - **Espaçamento**: escala de 4px (xxs a xxl).

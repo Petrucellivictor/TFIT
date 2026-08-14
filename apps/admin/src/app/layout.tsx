@@ -13,11 +13,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#1ef2a6",
-          colorBackground: "#0d1119",
-          colorInput: "#020306",
-          colorForeground: "#f4f6f9",
-          colorMutedForeground: "#94a0b2",
+          colorPrimary: "#d4af37",
+          colorBackground: "#161616",
+          colorInput: "#000000",
+          colorForeground: "#ffffff",
+          colorMutedForeground: "#b3b3b3",
           colorBorder: "rgba(255, 255, 255, 0.16)",
           borderRadius: "10px",
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",

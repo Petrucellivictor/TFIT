@@ -1,27 +1,27 @@
 :root {
   color-scheme: dark;
 
-  --bg-base: #05070c;
-  --bg-raised: #0d1119;
-  --bg-sunken: #020306;
+  --bg-base: #0a0a0a;
+  --bg-raised: #161616;
+  --bg-sunken: #000000;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
 
-  --text-primary: #f4f6f9;
-  --text-secondary: #94a0b2;
-  --text-disabled: #5a6474;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-disabled: #595959;
 
-  --accent-mint: #1ef2a6;
-  --accent-blue: #3db2ff;
-  --accent-gradient: linear-gradient(135deg, var(--accent-mint), var(--accent-blue));
-  --accent-muted: rgba(30, 242, 166, 0.14);
+  --accent-gold: #d4af37;
+  --accent-white: #ffffff;
+  --accent-gradient: linear-gradient(135deg, #f2d272, #b8860b);
+  --accent-muted: rgba(212, 175, 55, 0.14);
 
-  --status-pending: #ffc24b;
-  --status-pending-bg: rgba(255, 194, 75, 0.14);
+  --status-pending: #ff8a3d;
+  --status-pending-bg: rgba(255, 138, 61, 0.14);
   --status-reviewed: #2fe38a;
   --status-reviewed-bg: rgba(47, 227, 138, 0.14);
-  --status-dismissed: #94a0b2;
-  --status-dismissed-bg: rgba(148, 160, 178, 0.14);
+  --status-dismissed: #b3b3b3;
+  --status-dismissed-bg: rgba(179, 179, 179, 0.14);
   --status-danger: #ff5c72;
 
   --radius-sm: 6px;
@@ -177,7 +177,7 @@ button {
 .tab.active {
   color: var(--text-primary);
   font-weight: 600;
-  border-bottom-color: var(--accent-mint);
+  border-bottom-color: var(--accent-gold);
 }
 
 .tab-count {
@@ -317,7 +317,7 @@ button {
 
 .btn-primary {
   background: var(--accent-gradient);
-  color: #04110b;
+  color: #0a0a0a;
 }
 
 .btn-secondary {

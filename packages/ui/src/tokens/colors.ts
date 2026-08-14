@@ -1,10 +1,10 @@
 /**
  * Semantic color tokens. Components must reference these, never raw hex.
- * "Performance Tech" identity (revised for a more elaborate, health/gym-tech
- * feel — data-forward, wearable-inspired, not a generic pastel app):
- * deep, near-black surfaces with a vivid electric mint/blue accent pairing
- * used for gradients, glows, and data visualization (score rings, bars).
- * Dark mode is the flagship, not an inversion of light — see docs/DESIGN_SYSTEM.md.
+ * "TFIT Gold" identity, matching the official logo: black surfaces with a
+ * rich gold/white accent pairing (replaces the earlier electric mint/blue
+ * "Performance Tech" palette) — used for gradients, glows, and data
+ * visualization (score rings, bars). Dark mode is the flagship, not an
+ * inversion of light — see docs/DESIGN_SYSTEM.md.
  */
 export interface ColorTokens {
   background: {
@@ -67,59 +67,59 @@ export const lightColors: ColorTokens = {
     strong: "#C3CDD6",
   },
   accent: {
-    primary: "#00B884",
-    secondary: "#0091FF",
-    primaryMuted: "#D9F5EC",
+    primary: "#A67C00",
+    secondary: "#2B2B2B",
+    primaryMuted: "#F5E9C6",
     onPrimary: "#FFFFFF",
   },
   feedback: {
     success: "#1FAE6E",
-    warning: "#B7791F",
+    warning: "#C2540E",
     danger: "#E0303F",
   },
   overlay: "rgba(6, 12, 18, 0.5)",
   gradient: {
-    primary: ["#00B884", "#0091FF"],
-    hero: ["#0B1420", "#173049"],
+    primary: ["#D4AF37", "#8B6914"],
+    hero: ["#000000", "#1A1509"],
     heroText: "#FFFFFF",
-    heroTextMuted: "#AEB9C4",
+    heroTextMuted: "#C4C4C4",
   },
 };
 
 export const darkColors: ColorTokens = {
   background: {
-    base: "#060A10",
-    raised: "#101823",
-    sunken: "#03060A",
-    pressed: "#182231",
+    base: "#0A0A0A",
+    raised: "#161616",
+    sunken: "#000000",
+    pressed: "#1F1F1F",
   },
   text: {
-    primary: "#F3F7FA",
-    secondary: "#8A97A8",
-    muted: "#647082",
-    inverse: "#04140F",
-    disabled: "#4C5866",
+    primary: "#FFFFFF",
+    secondary: "#B3B3B3",
+    muted: "#8C8C8C",
+    inverse: "#0A0A0A",
+    disabled: "#595959",
   },
   border: {
-    subtle: "#1C2733",
-    strong: "#2E3B49",
+    subtle: "#2B2B2B",
+    strong: "#404040",
   },
   accent: {
-    primary: "#1EF2A6",
-    secondary: "#3DB2FF",
-    primaryMuted: "#0C3327",
-    onPrimary: "#04140F",
+    primary: "#D4AF37",
+    secondary: "#FFFFFF",
+    primaryMuted: "#2E2712",
+    onPrimary: "#0A0A0A",
   },
   feedback: {
     success: "#2FE38A",
-    warning: "#FFC24B",
+    warning: "#FF8A3D",
     danger: "#FF5C72",
   },
-  overlay: "rgba(2, 5, 9, 0.78)",
+  overlay: "rgba(0, 0, 0, 0.8)",
   gradient: {
-    primary: ["#1EF2A6", "#3DB2FF"],
-    hero: ["#0B1420", "#0E2A3E"],
+    primary: ["#F2D272", "#B8860B"],
+    hero: ["#000000", "#1A1509"],
     heroText: "#FFFFFF",
-    heroTextMuted: "#AEB9C4",
+    heroTextMuted: "#C4C4C4",
   },
 };
