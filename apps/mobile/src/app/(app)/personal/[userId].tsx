@@ -1,22 +1,55 @@
-import { ActivityIndicator, Linking, ScrollView } from "react-native";
+import { Linking, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, useTheme } from "@tfit/ui";
+import { Button, EmptyState, ErrorState, Skeleton, Stack, Surface, Text, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
+import { Avatar } from "@/components/Avatar";
 import { useProfessionalDirectory } from "@/hooks/useProfessionals";
 
 export default function ProfessionalDetailScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const theme = useTheme();
-  const { data, isLoading } = useProfessionalDirectory();
+  const { data, isLoading, isError } = useProfessionalDirectory();
+
+  if (isLoading) {
+    return (
+      <Screen>
+        <Stack gap="lg" style={{ padding: 24 }}>
+          <Stack direction="row" gap="md" align="center">
+            <Skeleton width={64} height={64} radius="pill" />
+            <Stack gap="xxs" style={{ flex: 1 }}>
+              <Skeleton width="55%" height={18} />
+              <Skeleton width="35%" height={14} />
+            </Stack>
+          </Stack>
+          <Skeleton height={80} />
+          <Skeleton height={120} />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar esse perfil agora." />
+        </Stack>
+      </Screen>
+    );
+  }
 
   const professional = data?.professionals.find((p) => p.userId === userId);
 
-  if (isLoading || !professional) {
+  if (!professional) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack style={{ flex: 1 }} justify="center">
+          <EmptyState
+            icon={<Ionicons name="person-outline" size={32} color={theme.colors.text.secondary} />}
+            title="Profissional não encontrado"
+            description="Esse perfil pode ter sido removido do diretório."
+          />
         </Stack>
       </Screen>
     );
@@ -27,12 +60,15 @@ export default function ProfessionalDetailScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ padding: 24, gap: theme.space.lg }}>
-        <Stack gap="xxs">
-          <Text variant="title">{professional.displayName}</Text>
-          <Text color="secondary">
-            {professional.specialty}
-            {professional.city ? ` · ${professional.city}` : ""}
-          </Text>
+        <Stack direction="row" gap="md" align="center">
+          <Avatar uri={professional.avatarUrl} name={professional.displayName} size={64} />
+          <Stack gap="xxs" style={{ flex: 1 }}>
+            <Text variant="title">{professional.displayName}</Text>
+            <Text color="secondary">
+              {professional.specialty}
+              {professional.city ? ` · ${professional.city}` : ""}
+            </Text>
+          </Stack>
         </Stack>
 
         <Surface level="raised" style={{ padding: theme.space.md }}>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, Pressable } from "react-native";
+import { FlatList, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
+import { Button, EmptyState, ErrorState, Skeleton, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import type { MyProfessionalServiceItem } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import {
@@ -101,12 +101,22 @@ function ServiceRow({
         </Stack>
       </Stack>
       <Stack direction="row" gap="md">
-        <Pressable onPress={() => updateService.mutate({ id: service.id, input: { isActive: !service.isActive } })}>
+        <Pressable
+          onPress={() => updateService.mutate({ id: service.id, input: { isActive: !service.isActive } })}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={service.isActive ? `Ocultar ${service.title}` : `Reativar ${service.title}`}
+        >
           <Text variant="label" style={{ color: theme.colors.accent.primary }}>
             {service.isActive ? "Ocultar" : "Reativar"}
           </Text>
         </Pressable>
-        <Pressable onPress={() => deleteService.mutate(service.id)}>
+        <Pressable
+          onPress={() => deleteService.mutate(service.id)}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={`Remover ${service.title}`}
+        >
           <Text variant="label" style={{ color: theme.colors.feedback.danger }}>
             Remover
           </Text>
@@ -118,7 +128,7 @@ function ServiceRow({
 
 export default function ProfessionalMenuScreen() {
   const theme = useTheme();
-  const { data, isLoading } = useMyServices();
+  const { data, isLoading, isError } = useMyServices();
   const reorderServices = useReorderServices();
   const [isAdding, setIsAdding] = useState(false);
 
@@ -136,8 +146,20 @@ export default function ProfessionalMenuScreen() {
   if (isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="md" style={{ padding: 24 }}>
+          <Skeleton width="40%" height={22} />
+          <Skeleton height={90} />
+          <Skeleton height={90} />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar seu cardápio agora." />
         </Stack>
       </Screen>
     );
@@ -164,9 +186,10 @@ export default function ProfessionalMenuScreen() {
           </Stack>
         }
         ListEmptyComponent={
-          <Text color="secondary" style={{ textAlign: "center", marginTop: theme.space.lg }}>
-            Nenhum item no cardápio ainda.
-          </Text>
+          <EmptyState
+            icon={<Ionicons name="restaurant-outline" size={32} color={theme.colors.text.secondary} />}
+            title="Nenhum item no cardápio ainda"
+          />
         }
         renderItem={({ item, index }) => (
           <ServiceRow

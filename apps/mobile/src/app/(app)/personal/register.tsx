@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ActivityIndicator, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { Button, Stack, Text, TextField, useTheme, useToast } from "@tfit/ui";
+import { Button, ErrorState, Skeleton, Stack, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import type { MyProfessionalProfile } from "@tfit/types";
 import { Screen } from "@/components/Screen";
 import {
@@ -99,13 +99,26 @@ function ProfileForm({ initialProfile }: { initialProfile: MyProfessionalProfile
 }
 
 export default function RegisterProfessionalScreen() {
-  const { data, isLoading } = useMyProfessionalProfile();
+  const { data, isLoading, isError } = useMyProfessionalProfile();
 
   if (isLoading) {
     return (
       <Screen>
-        <Stack align="center" justify="center" style={{ flex: 1 }}>
-          <ActivityIndicator />
+        <Stack gap="lg" style={{ padding: 24 }}>
+          <Skeleton width="60%" height={22} />
+          <Skeleton height={48} />
+          <Skeleton height={100} />
+          <Skeleton height={48} />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Screen>
+        <Stack style={{ flex: 1 }} justify="center">
+          <ErrorState message="Não conseguimos carregar seu perfil profissional agora." />
         </Stack>
       </Screen>
     );
