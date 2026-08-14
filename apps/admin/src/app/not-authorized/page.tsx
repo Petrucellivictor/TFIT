@@ -1,8 +1,22 @@
+import { SignOutButton } from "@clerk/nextjs";
+
 export default function NotAuthorizedPage() {
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: 48, textAlign: "center" }}>
-      <h1>Acesso restrito</h1>
-      <p>Sua conta não tem permissão para acessar o painel administrativo da TFIT.</p>
-    </main>
+    <div className="centered-page">
+      <span className="state-icon" aria-hidden="true">
+        🔒
+      </span>
+      <h1 className="page-title" style={{ margin: 0 }}>
+        Acesso restrito
+      </h1>
+      <p className="page-subtitle" style={{ margin: 0 }}>
+        Sua conta não tem permissão para acessar o painel administrativo da TFIT.
+      </p>
+      <SignOutButton>
+        <button type="button" className="btn btn-secondary">
+          Entrar com outra conta
+        </button>
+      </SignOutButton>
+    </div>
   );
 }

@@ -1,7 +1,9 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import { getDb, posts, postComments, profiles, reports } from "@tfit/database";
 
 export type ReportStatusFilter = "pending" | "reviewed" | "dismissed" | "all";
+
+export type ReportStatusCounts = Record<ReportStatusFilter, number>;
 
 export interface ReportRow {
   id: string;
@@ -13,6 +15,21 @@ export interface ReportRow {
   createdAt: string;
   reporter: { handle: string; displayName: string } | null;
   targetSummary: string;
+}
+
+export async function countReportsByStatus(): Promise<ReportStatusCounts> {
+  const db = getDb();
+  const rows = await db
+    .select({ status: reports.status, count: sql<number>`count(*)::int` })
+    .from(reports)
+    .groupBy(reports.status);
+
+  const counts: ReportStatusCounts = { pending: 0, reviewed: 0, dismissed: 0, all: 0 };
+  for (const row of rows) {
+    counts[row.status] = row.count;
+    counts.all += row.count;
+  }
+  return counts;
 }
 
 /** Batched (not N+1) — same pattern as apps/backend's postSummary/professionalServices helpers. */

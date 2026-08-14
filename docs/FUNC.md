@@ -12,7 +12,7 @@ TFIT (App Fit) é um app de personal trainer com IA, acompanhamento de evoluçã
 
 **Apps que compõem o sistema:**
 - **App mobile** (React Native/Expo) — o produto principal, usado pelo usuário final.
-- **Painel admin** (web, Next.js) — uso interno, só para moderação de denúncias.
+- **Painel admin** (web, Next.js) — "Moderation Command Center", uso interno, só para moderação de denúncias.
 - **Backend/API** — não tem interface própria (serve os dois acima).
 
 ---
@@ -232,11 +232,14 @@ Menu (modal deslizando de baixo) com 3 opções: **Iniciar treino**, **Check-in 
 
 ---
 
-## 13. Painel administrativo (web, uso interno)
+## 13. Painel administrativo — "Moderation Command Center" (web, uso interno)
 
-- Login via conta Clerk, restrito a e-mails autorizados (sem essa permissão, tela "Acesso restrito").
-- **Fila de denúncias**: abas de filtro (Pendentes / Revisadas / Arquivadas / Todas). Cada denúncia mostra: motivo, status, data, quem denunciou, o alvo (post/comentário/usuário, com um resumo do conteúdo ou aviso se já foi removido), detalhes do denunciante. Ações "Marcar como revisado" / "Arquivar" (só em pendentes).
-- Interface simples, HTML/CSS puro (não usa o design system do app mobile) — é a maior oportunidade de melhoria visual se quiser um painel mais robusto.
+- Login via conta Clerk, restrito a e-mails autorizados (sem essa permissão, tela "Acesso restrito" com opção de entrar com outra conta). Cabeçalho fixo com marca, e-mail da conta logada e botão "Sair" em toda página autenticada.
+- **Fila de denúncias**: abas de filtro (Pendentes / Revisadas / Arquivadas / Todas), cada uma com contador de itens. Cada denúncia mostra: motivo, selo de status colorido, data (formato técnico), quem denunciou, o alvo (post/comentário/usuário, com ícone por tipo e um resumo do conteúdo ou aviso se já foi removido), detalhes do denunciante. Ações "Marcar como revisado" / "Arquivar" (só em pendentes).
+- Estados de carregamento (esqueleto), vazio (ícone + mensagem) e erro (com botão "Tentar novamente") em todas as telas — antes não existiam.
+- Cada ação de moderação (revisar/arquivar) grava um registro em log de auditoria (quem, o quê, quando) — não há tela para consultar esse histórico ainda, só o registro em si.
+- Interface própria, escura, com identidade visual distinta do app mobile (não reaproveita o `@tfit/ui`, que é específico para React Native) mas com o mesmo acento de marca (gradiente verde-elétrico → azul usado com moderação: ação primária, aba ativa, badge de pendente).
+- Segue sendo apenas a fila de denúncias — sem gestão de usuários, conteúdo ou métricas.
 
 ---
 

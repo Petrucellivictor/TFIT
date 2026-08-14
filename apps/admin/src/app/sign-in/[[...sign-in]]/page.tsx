@@ -2,8 +2,12 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
   return (
-    <main style={{ display: "flex", justifyContent: "center", padding: 48 }}>
+    <div className="centered-page">
+      <div className="brand" style={{ fontSize: 15, marginBottom: 8 }}>
+        <span className="brand-dot" aria-hidden="true" />
+        TFIT · Moderation Command Center
+      </div>
       <SignIn />
-    </main>
+    </div>
   );
 }
