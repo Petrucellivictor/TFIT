@@ -10,6 +10,7 @@
     "push": "dotenv -e ../apps/backend/.env.local -- drizzle-kit push",
     "studio": "dotenv -e ../apps/backend/.env.local -- drizzle-kit studio",
     "seed": "dotenv -e ../apps/backend/.env.local -- tsx src/seed/run.ts",
+    "upload-animations": "dotenv -e ../apps/backend/.env.local -- tsx src/seed/uploadExerciseAnimations.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
+    "@vercel/blob": "^1",
     "dotenv-cli": "^7.4.4",
     "drizzle-kit": "^0.31.10",
     "tsx": "^4",
