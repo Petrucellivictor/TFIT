@@ -148,6 +148,9 @@ export default function WorkoutSessionScreen() {
       <Screen>
         <RestTimer
           seconds={task.restSeconds}
+          currentExerciseName={task.exerciseName}
+          currentSetNumber={task.setNumber}
+          totalSets={task.totalSets}
           nextExerciseName={nextTask?.exerciseName}
           nextSetLabel={nextTask ? `${nextTask.repsMin}-${nextTask.repsMax} repetições` : undefined}
           onDone={() => {

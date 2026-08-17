@@ -9,11 +9,22 @@ const EMPHASIS_THRESHOLD_SECONDS = 5;
 export interface RestTimerProps {
   seconds: number;
   onDone: () => void;
+  currentExerciseName?: string;
+  currentSetNumber?: number;
+  totalSets?: number;
   nextExerciseName?: string;
   nextSetLabel?: string;
 }
 
-export function RestTimer({ seconds, onDone, nextExerciseName, nextSetLabel }: RestTimerProps) {
+export function RestTimer({
+  seconds,
+  onDone,
+  currentExerciseName,
+  currentSetNumber,
+  totalSets,
+  nextExerciseName,
+  nextSetLabel,
+}: RestTimerProps) {
   const theme = useTheme();
   const [remaining, setRemaining] = useState(seconds);
   const pulse = useSharedValue(1);
@@ -39,6 +50,18 @@ export function RestTimer({ seconds, onDone, nextExerciseName, nextSetLabel }: R
 
   return (
     <Stack align="center" gap="lg" style={{ flex: 1, justifyContent: "center", padding: 32 }}>
+      {currentExerciseName ? (
+        <Stack align="center" gap="xxs">
+          {currentSetNumber && totalSets ? (
+            <Surface level="sunken" radius="pill" style={{ paddingVertical: theme.space.xxs, paddingHorizontal: theme.space.sm }}>
+              <Text variant="label" color="secondary">
+                SÉRIE {currentSetNumber} DE {totalSets}
+              </Text>
+            </Surface>
+          ) : null}
+          <Text variant="headline">{currentExerciseName}</Text>
+        </Stack>
+      ) : null}
       <Text variant="label" color="secondary">
         DESCANSO
       </Text>

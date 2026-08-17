@@ -9,6 +9,10 @@ import { useMe } from "@/hooks/useMe";
 import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
 import { useGamificationProfile } from "@/hooks/useGamification";
 
+function repsLabel(repsMin: number, repsMax: number): string {
+  return repsMin === repsMax ? `${repsMin}` : `${repsMin}-${repsMax}`;
+}
+
 function greeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Bom dia";
@@ -192,6 +196,24 @@ export default function HomeScreen() {
                   <Text color="secondary">{todayWorkout.exercises.length} exercícios</Text>
                 </Stack>
                 <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              </Stack>
+
+              <Stack gap="xxs" style={{ marginTop: theme.space.xs }}>
+                {todayWorkout.exercises.slice(0, 3).map((item, index) => (
+                  <Stack key={item.id} direction="row" justify="space-between" gap="sm">
+                    <Text variant="caption" color="secondary" style={{ flex: 1 }} numberOfLines={1}>
+                      {index + 1}. {item.exercise.name}
+                    </Text>
+                    <Text variant="caption" color="secondary">
+                      {item.sets}x{repsLabel(item.repsMin, item.repsMax)}
+                    </Text>
+                  </Stack>
+                ))}
+                {todayWorkout.exercises.length > 3 ? (
+                  <Text variant="caption" color="secondary">
+                    +{todayWorkout.exercises.length - 3} exercícios
+                  </Text>
+                ) : null}
               </Stack>
             </Surface>
           </Pressable>

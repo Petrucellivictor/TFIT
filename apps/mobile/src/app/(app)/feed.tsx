@@ -67,7 +67,7 @@ export default function FeedScreen() {
         }}
         ListHeaderComponent={
           <Stack direction="row" justify="space-between" align="center" style={{ marginBottom: theme.space.md }}>
-            <Text variant="title">Feed</Text>
+            <Text variant="title">Comunidade TFIT</Text>
             <Pressable
               onPress={() => router.push("/notifications")}
               hitSlop={8}

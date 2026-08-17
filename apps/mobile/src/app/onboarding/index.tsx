@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ScrollView } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import Animated, { SlideInRight } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import type {
   EquipmentPreference,
   ExperienceLevel,
@@ -16,14 +17,81 @@ import { Chip } from "@/components/Chip";
 import { StepProgress } from "@/components/StepProgress";
 import { useSubmitOnboarding } from "@/hooks/useMe";
 
-const GOAL_OPTIONS: { value: FitnessGoal; label: string }[] = [
-  { value: "lose_weight", label: "Emagrecer" },
-  { value: "gain_muscle", label: "Ganhar massa muscular" },
-  { value: "gain_strength", label: "Ganhar força" },
-  { value: "improve_conditioning", label: "Melhorar condicionamento" },
-  { value: "health_and_wellbeing", label: "Saúde e qualidade de vida" },
-  { value: "other", label: "Outro" },
+const GOAL_OPTIONS: {
+  value: FitnessGoal;
+  label: string;
+  description: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { value: "lose_weight", label: "Emagrecer", description: "Reduzir percentual de gordura", icon: "flame-outline" },
+  { value: "gain_muscle", label: "Ganhar massa muscular", description: "Hipertrofia focada", icon: "barbell-outline" },
+  { value: "gain_strength", label: "Ganhar força", description: "Foco em carga e potência", icon: "flash-outline" },
+  {
+    value: "improve_conditioning",
+    label: "Melhorar condicionamento",
+    description: "Resistência cardiovascular",
+    icon: "pulse-outline",
+  },
+  {
+    value: "health_and_wellbeing",
+    label: "Saúde e qualidade de vida",
+    description: "Manutenção geral",
+    icon: "heart-outline",
+  },
+  { value: "other", label: "Outro", description: "Especifique adiante", icon: "ellipsis-horizontal-outline" },
 ];
+
+function GoalOptionCard({
+  icon,
+  label,
+  description,
+  selected,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  description: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}>
+      <Surface
+        level="raised"
+        bordered
+        style={{
+          padding: theme.space.md,
+          borderColor: selected ? theme.colors.accent.primary : theme.colors.border.subtle,
+          borderWidth: selected ? 2 : 1,
+        }}
+      >
+        <Stack direction="row" gap="md" align="center">
+          <Surface
+            radius="pill"
+            style={{
+              width: 44,
+              height: 44,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: selected ? theme.colors.accent.primaryMuted : theme.colors.background.sunken,
+            }}
+          >
+            <Ionicons name={icon} size={22} color={selected ? theme.colors.accent.primary : theme.colors.text.secondary} />
+          </Surface>
+          <Stack style={{ flex: 1 }} gap="xxs">
+            <Text variant="bodyStrong">{label}</Text>
+            <Text variant="caption" color="secondary">
+              {description}
+            </Text>
+          </Stack>
+          {selected ? <Ionicons name="checkmark-circle" size={22} color={theme.colors.accent.primary} /> : null}
+        </Stack>
+      </Surface>
+    </Pressable>
+  );
+}
 
 const EXPERIENCE_OPTIONS: { value: ExperienceLevel; label: string }[] = [
   { value: "never_trained", label: "Nunca treinei" },
@@ -171,11 +239,13 @@ export default function OnboardingScreen() {
             )}
 
             {stepKey === "goal" && (
-              <Stack direction="row" gap="sm" style={{ flexWrap: "wrap" }}>
+              <Stack gap="sm">
                 {GOAL_OPTIONS.map((option) => (
-                  <Chip
+                  <GoalOptionCard
                     key={option.value}
+                    icon={option.icon}
                     label={option.label}
+                    description={option.description}
                     selected={goal === option.value}
                     onPress={() => setGoal(option.value)}
                   />
