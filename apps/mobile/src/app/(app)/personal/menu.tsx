@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlatList, Pressable } from "react-native";
+import { Alert, FlatList, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, EmptyState, ErrorState, Skeleton, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
 import type { MyProfessionalServiceItem } from "@tfit/types";
@@ -54,12 +54,14 @@ function ServiceRow({
   service,
   isFirst,
   isLast,
+  isReordering,
   onMoveUp,
   onMoveDown,
 }: {
   service: MyProfessionalServiceItem;
   isFirst: boolean;
   isLast: boolean;
+  isReordering: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;
 }) {
@@ -82,27 +84,36 @@ function ServiceRow({
         <Stack gap="xxs" align="center">
           <Pressable
             onPress={onMoveUp}
-            disabled={isFirst}
+            disabled={isFirst || isReordering}
             hitSlop={6}
             accessibilityRole="button"
             accessibilityLabel="Mover para cima"
           >
-            <Ionicons name="chevron-up" size={20} color={isFirst ? theme.colors.text.disabled : theme.colors.text.secondary} />
+            <Ionicons
+              name="chevron-up"
+              size={20}
+              color={isFirst || isReordering ? theme.colors.text.disabled : theme.colors.text.secondary}
+            />
           </Pressable>
           <Pressable
             onPress={onMoveDown}
-            disabled={isLast}
+            disabled={isLast || isReordering}
             hitSlop={6}
             accessibilityRole="button"
             accessibilityLabel="Mover para baixo"
           >
-            <Ionicons name="chevron-down" size={20} color={isLast ? theme.colors.text.disabled : theme.colors.text.secondary} />
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={isLast || isReordering ? theme.colors.text.disabled : theme.colors.text.secondary}
+            />
           </Pressable>
         </Stack>
       </Stack>
       <Stack direction="row" gap="md">
         <Pressable
           onPress={() => updateService.mutate({ id: service.id, input: { isActive: !service.isActive } })}
+          disabled={updateService.isPending}
           hitSlop={6}
           accessibilityRole="button"
           accessibilityLabel={service.isActive ? `Ocultar ${service.title}` : `Reativar ${service.title}`}
@@ -112,7 +123,13 @@ function ServiceRow({
           </Text>
         </Pressable>
         <Pressable
-          onPress={() => deleteService.mutate(service.id)}
+          onPress={() =>
+            Alert.alert("Remover item?", `"${service.title}" será removido do seu cardápio.`, [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Remover", style: "destructive", onPress: () => deleteService.mutate(service.id) },
+            ])
+          }
+          disabled={deleteService.isPending}
           hitSlop={6}
           accessibilityRole="button"
           accessibilityLabel={`Remover ${service.title}`}
@@ -196,6 +213,7 @@ export default function ProfessionalMenuScreen() {
             service={item}
             isFirst={index === 0}
             isLast={index === services.length - 1}
+            isReordering={reorderServices.isPending}
             onMoveUp={() => move(index, -1)}
             onMoveDown={() => move(index, 1)}
           />

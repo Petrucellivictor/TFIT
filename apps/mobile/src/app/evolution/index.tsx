@@ -77,7 +77,7 @@ export default function EvolutionScreen() {
         {currentStreakDays > 0 ? (
           <Surface level="raised" style={{ padding: theme.space.md, flexDirection: "row", alignItems: "center", gap: theme.space.sm }}>
             <Text style={{ fontSize: 24 }}>🔥</Text>
-            <Text variant="bodyStrong">{currentStreakDays} dias de check-in seguidos</Text>
+            <Text variant="bodyStrong">{currentStreakDays} dias de sequência</Text>
           </Surface>
         ) : null}
 

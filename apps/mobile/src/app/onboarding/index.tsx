@@ -330,7 +330,7 @@ export default function OnboardingScreen() {
           </Animated.View>
         </ScrollView>
 
-        {submitError ? <Text style={{ color: "#C0362C" }}>{submitError}</Text> : null}
+        {submitError ? <Text style={{ color: theme.colors.feedback.danger }}>{submitError}</Text> : null}
 
         <Stack direction="row" gap="sm">
           {step > 0 && <Button label="Voltar" variant="secondary" onPress={() => setStep((s) => s - 1)} />}

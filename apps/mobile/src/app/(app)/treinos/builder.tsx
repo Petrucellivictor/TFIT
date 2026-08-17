@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, Pressable } from "react-native";
+import { Alert, ScrollView, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Button, Stack, Surface, Text, TextField, useTheme, useToast } from "@tfit/ui";
@@ -52,6 +52,18 @@ export default function WorkoutBuilderScreen() {
   };
 
   const removeDay = (dayKey: string) => {
+    const day = days.find((d) => d.key === dayKey);
+    if (day && day.exercises.length > 0) {
+      Alert.alert(
+        "Remover dia?",
+        `"${day.name}" tem ${day.exercises.length} exercício(s) que serão perdidos.`,
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Remover", style: "destructive", onPress: () => setDays((prev) => prev.filter((d) => d.key !== dayKey)) },
+        ],
+      );
+      return;
+    }
     setDays((prev) => prev.filter((d) => d.key !== dayKey));
   };
 

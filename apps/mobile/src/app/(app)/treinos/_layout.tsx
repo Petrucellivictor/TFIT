@@ -1,8 +1,12 @@
 import { Stack } from "expo-router";
+import { useTheme } from "@tfit/ui";
+import { themedStackScreenOptions } from "@/lib/navigation";
 
 export default function TreinosStackLayout() {
+  const theme = useTheme();
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ ...themedStackScreenOptions(theme), headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="[workoutId]" options={{ headerShown: true }} />
       <Stack.Screen name="plans" options={{ headerShown: true, title: "Meus planos" }} />

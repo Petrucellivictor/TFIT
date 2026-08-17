@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useSignUp } from "@clerk/expo/legacy";
-import { Button, Stack, Text, TextField } from "@tfit/ui";
+import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 
 export default function SignUpScreen() {
+  const theme = useTheme();
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
   const [emailAddress, setEmailAddress] = useState("");
@@ -57,7 +58,7 @@ export default function SignUpScreen() {
             <Text color="secondary">Enviamos um código para {emailAddress}.</Text>
           </Stack>
           <TextField label="Código" keyboardType="number-pad" value={code} onChangeText={setCode} />
-          {error ? <Text style={{ color: "#C0362C" }}>{error}</Text> : null}
+          {error ? <Text style={{ color: theme.colors.feedback.danger }}>{error}</Text> : null}
           <Button label={submitting ? "Confirmando..." : "Confirmar"} onPress={onVerify} disabled={submitting} />
         </Stack>
       </Screen>
@@ -83,7 +84,7 @@ export default function SignUpScreen() {
           <TextField label="Senha" secureTextEntry value={password} onChangeText={setPassword} />
         </Stack>
 
-        {error ? <Text style={{ color: "#C0362C" }}>{error}</Text> : null}
+        {error ? <Text style={{ color: theme.colors.feedback.danger }}>{error}</Text> : null}
 
         <Button label={submitting ? "Criando..." : "Criar conta"} onPress={onSignUp} disabled={submitting} />
 

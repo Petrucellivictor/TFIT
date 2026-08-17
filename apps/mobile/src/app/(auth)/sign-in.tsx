@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useSignIn } from "@clerk/expo/legacy";
-import { Button, Stack, Text, TextField } from "@tfit/ui";
+import { Button, Stack, Text, TextField, useTheme } from "@tfit/ui";
 import { Screen } from "@/components/Screen";
 
 export default function SignInScreen() {
+  const theme = useTheme();
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
   const [emailAddress, setEmailAddress] = useState("");
@@ -50,7 +51,7 @@ export default function SignInScreen() {
           <TextField label="Senha" secureTextEntry value={password} onChangeText={setPassword} />
         </Stack>
 
-        {error ? <Text style={{ color: "#C0362C" }}>{error}</Text> : null}
+        {error ? <Text style={{ color: theme.colors.feedback.danger }}>{error}</Text> : null}
 
         <Button label={submitting ? "Entrando..." : "Entrar"} onPress={onSubmit} disabled={submitting} />
 

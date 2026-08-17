@@ -1,4 +1,4 @@
-import { Pressable } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheet, Stack, Text, useTheme } from "@tfit/ui";
 
@@ -19,12 +19,23 @@ export function PostActionSheet({ visible, onClose, isOwnPost, onDelete, onRepor
     action();
   };
 
+  const runWithConfirm = (title: string, message: string, confirmLabel: string, action: () => void) => {
+    onClose();
+    Alert.alert(title, message, [
+      { text: "Cancelar", style: "cancel" },
+      { text: confirmLabel, style: "destructive", onPress: action },
+    ]);
+  };
+
   return (
     <BottomSheet visible={visible} onClose={onClose}>
       <Stack gap="md">
         {isOwnPost ? (
           <Pressable
-            onPress={() => onDelete && run(onDelete)}
+            onPress={() =>
+              onDelete &&
+              runWithConfirm("Excluir post?", "Essa ação não pode ser desfeita.", "Excluir", onDelete)
+            }
             style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
           >
             <Ionicons name="trash-outline" size={22} color={theme.colors.feedback.danger} />
@@ -43,7 +54,14 @@ export function PostActionSheet({ visible, onClose, isOwnPost, onDelete, onRepor
             </Pressable>
             {onBlockAuthor ? (
               <Pressable
-                onPress={() => run(onBlockAuthor)}
+                onPress={() =>
+                  runWithConfirm(
+                    "Bloquear usuário?",
+                    "Vocês deixarão de se seguir e essa pessoa não poderá mais ver seu conteúdo.",
+                    "Bloquear",
+                    onBlockAuthor,
+                  )
+                }
                 style={{ flexDirection: "row", alignItems: "center", gap: theme.space.sm }}
               >
                 <Ionicons name="person-remove-outline" size={22} color={theme.colors.feedback.danger} />

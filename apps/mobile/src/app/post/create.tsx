@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Image, Pressable } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@clerk/expo";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Stack, Surface, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import type { PostType, PostVisibility } from "@tfit/types";
@@ -21,6 +21,7 @@ const VISIBILITY_OPTIONS: { value: PostVisibility; label: string }[] = [
 export default function CreatePostScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const navigation = useNavigation();
   const { getToken } = useAuth();
   const createPost = useCreatePost();
   const toast = useToast();
@@ -30,6 +31,20 @@ export default function CreatePostScreen() {
   const [visibility, setVisibility] = useState<PostVisibility>("public");
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const publishedRef = useRef(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      const hasUnsavedChanges = !publishedRef.current && (asset !== null || caption.trim().length > 0);
+      if (!hasUnsavedChanges) return;
+      e.preventDefault();
+      Alert.alert("Descartar post?", "Você vai perder a foto e o texto que escreveu.", [
+        { text: "Continuar editando", style: "cancel" },
+        { text: "Descartar", style: "destructive", onPress: () => navigation.dispatch(e.data.action) },
+      ]);
+    });
+    return unsubscribe;
+  }, [navigation, asset, caption]);
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -70,6 +85,7 @@ export default function CreatePostScreen() {
       }
 
       await createPost.mutateAsync({ type, caption: caption.trim() || undefined, visibility, mediaUrls });
+      publishedRef.current = true;
       toast.show("Post publicado.", "success");
       router.back();
     } catch (err) {

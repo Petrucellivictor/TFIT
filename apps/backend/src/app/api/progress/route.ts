@@ -8,12 +8,12 @@ import {
   bodyMetrics,
   smartGoals,
   exerciseLibrary,
+  streaks,
 } from "@tfit/database";
 import { computeFitScore } from "@tfit/fitness-engine";
 import type { ProgressResponse } from "@tfit/types";
 import { jsonOk } from "@/lib/http";
 import { requireUser } from "@/lib/requireUser";
-import { computeCheckinStreak } from "@/lib/streak";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -28,7 +28,7 @@ export async function GET() {
   const fourteenDaysAgo = new Date(now.getTime() - 14 * DAY_MS);
   const ninetyDaysAgo = new Date(now.getTime() - 90 * DAY_MS);
 
-  const [activePlan, completedSessions, checkins, recentPrRows, weightRows, goalRows] = await Promise.all([
+  const [activePlan, completedSessions, checkins, recentPrRows, weightRows, goalRows, streakRow] = await Promise.all([
     db.query.workoutPlans.findFirst({
       where: and(eq(workoutPlans.userId, userId), eq(workoutPlans.status, "active")),
     }),
@@ -61,6 +61,7 @@ export async function GET() {
       .leftJoin(exerciseLibrary, eq(smartGoals.exerciseId, exerciseLibrary.id))
       .where(and(eq(smartGoals.userId, userId), eq(smartGoals.status, "active")))
       .orderBy(desc(smartGoals.createdAt)),
+    db.query.streaks.findFirst({ where: eq(streaks.userId, userId) }),
   ]);
 
   const recentCheckins = checkins.filter((c) => new Date(c.date) >= fourteenDaysAgo);
@@ -101,7 +102,10 @@ export async function GET() {
       createdAt: goal.createdAt.toISOString(),
       achievedAt: goal.achievedAt?.toISOString() ?? null,
     })),
-    currentStreakDays: computeCheckinStreak(checkins.map((c) => c.date)),
+    // Same persisted streak shown on the home screen (freeze-aware, advances on
+    // check-in OR workout completion) — previously recomputed a separate,
+    // check-in-only value here, which could disagree with home and confuse users.
+    currentStreakDays: streakRow?.currentStreak ?? 0,
   };
 
   return jsonOk(response);

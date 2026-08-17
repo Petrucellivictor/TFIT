@@ -74,6 +74,7 @@ export default function PostDetailScreen() {
                 onPressAuthor={() => router.push({ pathname: "/profile/[handle]", params: { handle: item.author.handle } })}
                 onPress={() => {}}
                 onToggleLike={() => toggleLike.mutate({ postId: item.id, liked: item.likedByViewer })}
+                isTogglingLike={toggleLike.isPending && toggleLike.variables?.postId === item.id}
                 onOpenMenu={() => setMenuOpen(true)}
               />
             </View>

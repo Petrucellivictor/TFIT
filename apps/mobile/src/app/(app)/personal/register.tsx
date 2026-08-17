@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Button, ErrorState, Skeleton, Stack, Text, TextField, useTheme, useToast } from "@tfit/ui";
 import type { MyProfessionalProfile } from "@tfit/types";
@@ -89,7 +89,20 @@ function ProfileForm({ initialProfile }: { initialProfile: MyProfessionalProfile
           <Button
             label="Remover do diretório"
             variant="secondary"
-            onPress={() => deactivateProfile.mutate(undefined, { onSuccess: () => router.back() })}
+            onPress={() =>
+              Alert.alert(
+                "Remover do diretório?",
+                "Seu perfil deixará de aparecer na busca de profissionais. Você pode reativá-lo depois.",
+                [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Remover",
+                    style: "destructive",
+                    onPress: () => deactivateProfile.mutate(undefined, { onSuccess: () => router.back() }),
+                  },
+                ],
+              )
+            }
             disabled={deactivateProfile.isPending}
           />
         </>

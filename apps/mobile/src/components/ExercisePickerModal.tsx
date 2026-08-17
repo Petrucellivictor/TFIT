@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ActivityIndicator, FlatList, Modal, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { IconButton, Stack, Surface, Text, TextField, useTheme } from "@tfit/ui";
@@ -30,6 +31,7 @@ export function ExercisePickerModal({
   onSelect: (exercise: ExerciseListItem) => void;
 }) {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [muscle, setMuscle] = useState<string | undefined>(undefined);
@@ -42,7 +44,7 @@ export function ExercisePickerModal({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <Surface level="base" style={{ flex: 1, paddingTop: 60, paddingHorizontal: 24 }}>
+      <Surface level="base" style={{ flex: 1, paddingTop: insets.top + theme.space.md, paddingHorizontal: theme.space.lg }}>
         <Stack gap="md" style={{ flex: 1 }}>
           <Stack direction="row" justify="space-between" align="center">
             <Text variant="title">Escolher exercício</Text>
@@ -84,7 +86,7 @@ export function ExercisePickerModal({
             <FlatList
               data={data?.exercises ?? []}
               keyExtractor={(e) => e.id}
-              contentContainerStyle={{ gap: theme.space.sm, paddingBottom: 40 }}
+              contentContainerStyle={{ gap: theme.space.sm, paddingBottom: insets.bottom + theme.space.lg }}
               ListEmptyComponent={
                 <Text color="secondary" style={{ textAlign: "center", marginTop: theme.space.lg }}>
                   Nenhum exercício encontrado.

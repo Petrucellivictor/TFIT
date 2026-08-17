@@ -95,6 +95,7 @@ export default function FeedScreen() {
             onPressAuthor={() => router.push({ pathname: "/profile/[handle]", params: { handle: item.author.handle } })}
             onPress={() => router.push({ pathname: "/post/[id]", params: { id: item.id } })}
             onToggleLike={() => toggleLike.mutate({ postId: item.id, liked: item.likedByViewer })}
+            isTogglingLike={toggleLike.isPending && toggleLike.variables?.postId === item.id}
             onOpenMenu={() => setMenuPost(item)}
           />
         )}

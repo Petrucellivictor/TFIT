@@ -1,4 +1,4 @@
-import { FlatList } from "react-native";
+import { Alert, FlatList } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, EmptyState, ErrorState, Stack, Text, useTheme } from "@tfit/ui";
@@ -59,7 +59,12 @@ export default function FollowRequestsScreen() {
                   <Button
                     label="Recusar"
                     variant="secondary"
-                    onPress={() => reject.mutate(item.userId)}
+                    onPress={() =>
+                      Alert.alert("Recusar solicitação?", `${item.displayName} não será notificado(a).`, [
+                        { text: "Cancelar", style: "cancel" },
+                        { text: "Recusar", style: "destructive", onPress: () => reject.mutate(item.userId) },
+                      ])
+                    }
                     disabled={reject.isPending}
                   />
                 </Stack>

@@ -21,7 +21,17 @@ const POST_TYPE_ICON: Partial<Record<PostSummary["type"], keyof typeof Ionicons.
   streak: "flame",
 };
 
-function LikeButton({ liked, count, onToggle }: { liked: boolean; count: number; onToggle: () => void }) {
+function LikeButton({
+  liked,
+  count,
+  onToggle,
+  disabled,
+}: {
+  liked: boolean;
+  count: number;
+  onToggle: () => void;
+  disabled?: boolean;
+}) {
   const theme = useTheme();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
@@ -41,6 +51,7 @@ function LikeButton({ liked, count, onToggle }: { liked: boolean; count: number;
   return (
     <Pressable
       onPress={handlePress}
+      disabled={disabled}
       hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel={liked ? "Descurtir" : "Curtir"}
@@ -66,12 +77,14 @@ export function PostCard({
   onPressAuthor,
   onPress,
   onToggleLike,
+  isTogglingLike,
   onOpenMenu,
 }: {
   post: PostSummary;
   onPressAuthor: () => void;
   onPress: () => void;
   onToggleLike: () => void;
+  isTogglingLike?: boolean;
   onOpenMenu: () => void;
 }) {
   const theme = useTheme();
@@ -131,7 +144,7 @@ export function PostCard({
       ) : null}
 
       <Stack direction="row" gap="lg" align="center" style={{ padding: theme.space.md }}>
-        <LikeButton liked={post.likedByViewer} count={post.likeCount} onToggle={onToggleLike} />
+        <LikeButton liked={post.likedByViewer} count={post.likeCount} onToggle={onToggleLike} disabled={isTogglingLike} />
         <Pressable onPress={onPress} hitSlop={8} accessibilityRole="button" accessibilityLabel="Comentar">
           <Stack direction="row" gap="xxs" align="center">
             <Ionicons name="chatbubble-outline" size={20} color={theme.colors.text.secondary} />
